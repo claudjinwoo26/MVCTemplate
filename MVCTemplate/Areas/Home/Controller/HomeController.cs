@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using MVCTemplate.Models;
 using System.Diagnostics;
 
-namespace MVCTemplate.Controllers
+namespace MVCTemplate.Areas.Home.Controller
 {
     [Authorize]
     public class HomeController : Controller

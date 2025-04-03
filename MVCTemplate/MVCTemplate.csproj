@@ -22,4 +22,8 @@
     <ProjectReference Include="..\MVCTemplate.DataAccess\MVCTemplate.DataAccess.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Areas\Admin\" />
+  </ItemGroup>
+
 </Project>

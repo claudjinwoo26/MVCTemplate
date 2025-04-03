@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34723.18
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MVCTemplate", "MVCTemplate\MVCTemplate.csproj", "{1DF6F314-945A-4863-86DE-5D090F550F65}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MVCTemplate", "MVCTemplate\MVCTemplate.csproj", "{1DF6F314-945A-4863-86DE-5D090F550F65}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MVCTemplate.DataAccess", "MVCTemplate.DataAccess\MVCTemplate.DataAccess.csproj", "{CE50801C-0EC4-409C-A68E-2A950C986ED8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MVCTemplate.DataAccess", "MVCTemplate.DataAccess\MVCTemplate.DataAccess.csproj", "{CE50801C-0EC4-409C-A68E-2A950C986ED8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MVCTemplate.Models", "MVCTemplate.Models\MVCTemplate.Models.csproj", "{22B86FDA-F3F5-4E4F-8DF8-25E7FE202457}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MVCTemplate.Models", "MVCTemplate.Models\MVCTemplate.Models.csproj", "{22B86FDA-F3F5-4E4F-8DF8-25E7FE202457}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MVCTemplate.Util", "MVCTemplate.Util\MVCTemplate.Util.csproj", "{8BA9A40F-2793-4914-A725-B19E02304986}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MVCTemplate.Util", "MVCTemplate.Util\MVCTemplate.Util.csproj", "{8BA9A40F-2793-4914-A725-B19E02304986}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
