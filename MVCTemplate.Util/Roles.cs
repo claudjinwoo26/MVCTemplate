@@ -10,5 +10,6 @@ namespace MVCTemplate.Util
     {
         public const string  Admin = "admin";
         public const string User = "user";
+        public const string Default_Password = "TemplateDefault123!";
     }
 }
