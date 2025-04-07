@@ -1,0 +1,46 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Language" content="en">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>@ViewData["Title"] - HRIS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no">
+    <meta name="description" content="ArchitectUI HTML Bootstrap 5 Dashboard Template">
+    <meta name="msapplication-tap-highlight" content="no">
+    <link rel="stylesheet" href="@Url.Content("~/asset/vendors/@fortawesome/fontawesome-free/css/all.min.css")">
+    <link rel="stylesheet" href="~/asset/vendors/ionicons-npm/css/ionicons.css">
+    <link rel="stylesheet" href="~/asset/vendors/linearicons-master/dist/web-font/style.css">
+    <link rel="stylesheet" href="~/asset/vendors/pixeden-stroke-7-icon-master/pe-icon-7-stroke/dist/pe-icon-7-stroke.css">
+    <link rel="stylesheet" href="~/css/identity/login.css" />
+    <link href="~/asset/styles/css/base.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="~/asset/images/Flyingv.png">
+
+</head>
+<body style="background-image: url('../../../../../asset/images/el-kabayo.jpg');
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+            background-size: cover;
+            margin: 0;
+            height: 100vh;
+            width: 100vw;">
+
+    <div class="app-container body-tabs-shadow">
+        <div class="app-container">
+            <div class="h-100">
+                <div class="d-flex h-100 justify-content-center align-items-center">
+                    @RenderBody();
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="~/asset/vendors/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="~/asset/vendors/slick-carousel/slick/slick.min.js"></script>
+    <!-- custome.js -->
+    <script type="text/javascript" src="~/asset/js/carousel-slider.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>
