@@ -18,7 +18,6 @@ A clean and extensible ASP.NET MVC template using [ArchitectUI](https://dashboar
   - Models/ – Data models
   - Views/ – Razor views (HTML UI)
   - wwwroot/ – Static files (CSS, JS, images)
-  - ... – Additional layers and services
 
 ## 🎨 Features
 
