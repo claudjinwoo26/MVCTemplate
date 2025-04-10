@@ -1,0 +1,5 @@
+﻿@MVCTemplate_HostAddress = https://localhost:7072
+
+GET {{MVCTemplate_HostAddress}}/{area=Admin}/product/getallproducts/
+
+###

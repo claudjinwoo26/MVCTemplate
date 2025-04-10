@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MVCTemplate.DataAccess.Repository
 {
-    public class ProductRepository : Repository<Product>, IProductRepository
+    public class ProductRepository : Repository<ProductModel>, IProductRepository
     {
         private readonly ApplicationDbContext _db;
 
@@ -17,17 +17,17 @@ namespace MVCTemplate.DataAccess.Repository
         {
             _db = db;
         }
-        public Product? CheckIfUnique(string name)
+        public ProductModel? CheckIfUnique(string name)
         {
             return _db.Products.FirstOrDefault(i => i.Name == name);
         }
 
-        public Product? ContinueIfNoChangeOnUpdate(string name, int countryId)
+        public ProductModel? ContinueIfNoChangeOnUpdate(string name, int countryId)
         {
             return _db.Products.FirstOrDefault(i => i.Name == name && i.Id != countryId);
         }
 
-        public void Update(Product product)
+        public void Update(ProductModel product)
         {
             _db.Products.Update(product);
         }

@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using MVCTemplate.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MVCTemplate.Util;
-using MVCTemplate.Models;
 using MVCTemplate.DataAccess.Repository.IRepository;
 namespace MVCTemplate.Areas.Admin.Controllers
 {
@@ -21,6 +21,14 @@ namespace MVCTemplate.Areas.Admin.Controllers
             return View();
         }
 
+        #region API Calls
+        [HttpGet]
 
+        public IActionResult GetAllProducts()
+        {
+            List<ProductModel>? productList = _unitOfWork.Product.GetAll().ToList();
+            return Json(new { data = productList });
+        }
+        #endregion
     }
 }

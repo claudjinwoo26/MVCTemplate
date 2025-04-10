@@ -34,15 +34,21 @@
                 <ul class="vertical-nav-menu">
                    
                         <li class="app-sidebar__heading">
-                            Personal Information
+                            Tabs
                         </li>
 
                         <li class="mainMenu">
-                            <a asp-area="Staff" asp-controller="Dashboard" asp-action="Index" class="sideBarLink">
+                            <a asp-area="Admin" asp-controller="Home" asp-action="Index" class="sideBarLink">
                                 Home
                                 <i class="metismenu-icon pe-7s-home"></i>
                             </a>
                         </li>
+                    <li class="mainMenu">
+                        <a asp-area="Admin" asp-controller="Product" asp-action="Index" class="sideBarLink">
+                            Products
+                            <i class="metismenu-icon lnr-bookmark"></i>
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>

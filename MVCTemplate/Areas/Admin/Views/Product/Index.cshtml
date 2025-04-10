@@ -1,4 +1,4 @@
-﻿@model Product
+﻿@model ProductModel
 @{
     ViewData["Title"] = "Product";
 }
@@ -7,10 +7,10 @@
         <div class="page-title-wrapper">
             <div class="page-title-heading">
                 <div class="page-title-icon">
-                    <i class="lnr-earth icon-gradient bg-premium-dark"></i>
+                    <i class="lnr-bookmark icon-gradient bg-premium-dark"></i>
                 </div>
                 <div>
-                    <span class="text-primary"><b>Country</b></span>
+                    <span class="text-primary"><b>Products</b></span>
                 </div>
             </div>
             <div class="page-title-actions">
@@ -21,7 +21,7 @@
                     </button>
 
                     <button type="button" class="btn-shadow btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
-                        + Create Country
+                        + Add product
                     </button>
                 </div>
             </div>
@@ -30,7 +30,7 @@
     <div class="main-card mb-3 card">
         <div class="card-body">
             <div class="table-responsive">
-                <table style="width: 100%;" id="countryTable" class="table table-hover table-striped table-bordered">
+                <table style="width: 100%;" id="productTable" class="table table-hover table-striped table-bordered">
                     <thead>
                         <tr>
                             <th>Name</th>
@@ -46,3 +46,42 @@
         </div>
     </div>
 </div>
+
+@section Modal
+{
+    <div class="modal fade" id="createModal" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <form asp-action="Create" asp-controller="Product" method="post" id="createForm">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label asp-for="Name" class="control-label">Product Name<span class="text-danger">*</span></label>
+                            <input asp-for="Name" class="form-control" asp-for="Name" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn-shadow btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button id="createEditFormSubmitBtn" class="ladda-button  me-2 btn-shadow btn btn-primary" data-style="expand-left">
+                            <span class="ladda-label">Save Changes</span>
+                            <span class="ladda-spinner"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+@section Scripts {
+    <script src="~/js/validation.js"></script>
+    <script src="~/js/formSubmissionAjax.js"></script>
+    <script src="~/js/ProductScripts/product-data-table.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+    
+}
