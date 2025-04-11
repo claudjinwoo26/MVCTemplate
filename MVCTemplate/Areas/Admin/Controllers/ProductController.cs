@@ -1,9 +1,10 @@
-﻿using MVCTemplate.Models;
+﻿
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MVCTemplate.Util;
 using MVCTemplate.DataAccess.Repository.IRepository;
+using MVCTemplate.Models;
 namespace MVCTemplate.Areas.Admin.Controllers
 {
     [Authorize(Roles = $"{Roles.Admin}, {Roles.User}")]
@@ -21,11 +22,11 @@ namespace MVCTemplate.Areas.Admin.Controllers
             return View();
         }
 
-        public IActionResult Create(ProductModel product) 
+        public IActionResult Create(Models.Product product) 
         {
             try
             {
-                ProductModel? productCheck = _unitOfWork.Product.CheckIfUnique(product.Name);
+                Models.Product? productCheck = _unitOfWork.Product.CheckIfUnique(product.Name);
                 if (productCheck != null) 
                 {
                     ModelState.AddModelError("Name", "Product already exists");
@@ -62,7 +63,7 @@ namespace MVCTemplate.Areas.Admin.Controllers
 
         public IActionResult GetAllProducts()
         {
-            List<ProductModel>? productList = _unitOfWork.Product.GetAll().ToList();
+            List<Product>? productList = _unitOfWork.Product.GetAll().ToList();
             return Json(new { data = productList });
         }
         #endregion

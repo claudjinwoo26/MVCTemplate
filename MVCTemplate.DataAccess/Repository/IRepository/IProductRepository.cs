@@ -3,14 +3,14 @@ using MVCTemplate.Models;
 
 namespace MVCTemplate.DataAccess.Repository.IRepository
 {
-    public interface IProductRepository : IRepository<ProductModel>
+    public interface IProductRepository : IRepository<Product>
     {
-        void Update(ProductModel product);
+        void Update(Product product);
 
-        void Remove(ProductModel product);
+        void Remove(Product product);
 
-        ProductModel? CheckIfUnique(string name);
+        Product? CheckIfUnique(string name);
 
-        ProductModel? ContinueIfNoChangeOnUpdate(string name, int countryId);
+        Product? ContinueIfNoChangeOnUpdate(string name, int countryId);
     }
 }

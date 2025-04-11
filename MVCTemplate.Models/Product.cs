@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MVCTemplate.Models
 {
-    public class ProductModel
+    public class Product
     {
         [Key]
         public int Id { get; set; }
