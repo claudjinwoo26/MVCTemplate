@@ -14,5 +14,18 @@ namespace MVCTemplate.Models
         public string? Description { get; set; }
         [DisplayName("Product Quantity")]
         public int Quantity { get; set; }
+
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+
+        public Product()
+        {
+            CreatedAt = DateTime.Now;
+        }
+
+        public void GenerateUpdatedAt() 
+        {
+            this.UpdatedAt = DateTime.Now;
+        }
     }
 }

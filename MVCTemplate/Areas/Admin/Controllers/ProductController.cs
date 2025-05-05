@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using MVCTemplate.Util;
 using MVCTemplate.DataAccess.Repository.IRepository;
 using MVCTemplate.Models;
+using Microsoft.AspNetCore.Mvc.Abstractions;
 namespace MVCTemplate.Areas.Admin.Controllers
 {
     [Authorize(Roles = $"{Roles.Admin}, {Roles.User}")]
@@ -22,7 +23,7 @@ namespace MVCTemplate.Areas.Admin.Controllers
             return View();
         }
 
-        public IActionResult Create(Models.Product product) 
+        public IActionResult Create(Product product) 
         {
             try
             {
@@ -57,6 +58,26 @@ namespace MVCTemplate.Areas.Admin.Controllers
                 return BadRequest(new { message = "An unexpected error occurred" });
             }
         }
+
+        //public IActionResult Update(Product product) 
+        //{
+        //    try
+        //    {
+                
+        //    }
+        //    catch (DbUpdateException)
+        //    {
+        //        return BadRequest(new { message = "Error occurred while saving to database" });
+        //    }
+        //    catch (InvalidOperationException)
+        //    {
+        //        return BadRequest(new { message = "Invalid operation" });
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return BadRequest(new { message = "An unexpected error occurred" });
+        //    }
+        //}
 
         #region API Calls
         [HttpGet]
