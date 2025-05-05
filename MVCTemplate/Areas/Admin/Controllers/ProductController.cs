@@ -59,25 +59,43 @@ namespace MVCTemplate.Areas.Admin.Controllers
             }
         }
 
-        //public IActionResult Update(Product product) 
-        //{
-        //    try
-        //    {
+        public IActionResult Update(Product obj)
+        {
+            try
+            {
+                obj.GenerateUpdatedAt();
+                Product? product = _unitOfWork.Product.ContinueIfNoChangeOnUpdate(obj.Name, obj.Id);
+
+                if (product != null) 
+                {
+                    ModelState.AddModelError("Name", "Product Name Already exists");
+                }
+                if (ModelState.IsValid) 
+                {
+                    _unitOfWork.Product.Update(obj);
+                    _unitOfWork.Save();
+                    return Ok(new { message = "Updated Successfully" });
+                }
+                var errors = ModelState.ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value?.Errors?.Select(e => e.ErrorMessage)?.ToArray() ?? []);
+
+                return BadRequest(new { errors, message = "Something went wrong!" });
                 
-        //    }
-        //    catch (DbUpdateException)
-        //    {
-        //        return BadRequest(new { message = "Error occurred while saving to database" });
-        //    }
-        //    catch (InvalidOperationException)
-        //    {
-        //        return BadRequest(new { message = "Invalid operation" });
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return BadRequest(new { message = "An unexpected error occurred" });
-        //    }
-        //}
+            }
+            catch (DbUpdateException)
+            {
+                return BadRequest(new { message = "Error occurred while saving to database" });
+            }
+            catch (InvalidOperationException)
+            {
+                return BadRequest(new { message = "Invalid operation" });
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { message = "An unexpected error occurred" });
+            }
+        }
 
         #region API Calls
         [HttpGet]

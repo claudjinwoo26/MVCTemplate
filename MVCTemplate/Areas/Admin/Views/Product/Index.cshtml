@@ -100,9 +100,9 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                     </button>
                 </div>
-                <form asp-action="hidden" asp-controller="Product" method="put" id="updateForm">
+                <form asp-action="Update" asp-controller="Product" method="put" id="updateForm">
                     <div class="modal-body">
-                        <input type="text" asp-for="Id" id="productId" />
+                        <input type="hidden" asp-for="Id" id="productId" />
                         <div class="form-group">
                             <label asp-for="Name" class="control-label">Product Name:<span class="text-danger">*</span></label>
                             <input asp-for="Name" class="form-control" id="name" />
