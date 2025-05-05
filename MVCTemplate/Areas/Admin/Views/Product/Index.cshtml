@@ -49,6 +49,8 @@
 
 @section Modal
 {
+
+    @* Create Modal*@
     <div class="modal fade" id="createModal" tabindex="-1" role="dialog"
          aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -62,20 +64,60 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label asp-for="Name" class="control-label">Product Name<span class="text-danger">*</span></label>
-                            <input asp-for="Name" class="form-control" asp-for="Name" />
+                            <input asp-for="Name" class="form-control"/>
                             <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
                         <div class="form-group">
                             <label asp-for="Description" class="control-label">Product Description</label>
-                            <input asp-for="Description" class="form-control" asp-for="Description" />
+                            <input asp-for="Description" class="form-control"/>
                             <span asp-validation-for="Description" class="text-danger"></span>
                         </div>
                         <div class="form-group">
                             <label asp-for="Quantity" class="control-label">Product Quantity<span class="text-danger">*</span></label>
-                            <input asp-for="Quantity" type="number" class="form-control" asp-for="Quantity" />
+                            <input asp-for="Quantity" type="number" class="form-control" />
                             <span asp-validation-for="Quantity" class="text-danger"></span>
                         </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn-shadow btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button id="createAddFormSubmitBtn" class="ladda-button  me-2 btn-shadow btn btn-primary" data-style="expand-left">
+                            <span class="ladda-label">Save Changes</span>
+                            <span class="ladda-spinner"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
+    @* Update Modal *@
+    <div class="modal fade" id="updateModal" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Update Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <form asp-action="hidden" asp-controller="Product" method="put" id="updateForm">
+                    <div class="modal-body">
+                        <input type="text" asp-for="Id" id="productId" />
+                        <div class="form-group">
+                            <label asp-for="Name" class="control-label">Product Name:<span class="text-danger">*</span></label>
+                            <input asp-for="Name" class="form-control" id="name" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Description" class="control-label">Product Description</label>
+                            <input asp-for="Description" class="form-control" id="description"/>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Quantity" class="control-label">Product Quantity<span class="text-danger">*</span></label>
+                            <input asp-for="Quantity" type="number" class="form-control" id="quantity"/>
+                            <span asp-validation-for="Quantity" class="text-danger"></span>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn-shadow btn btn-secondary" data-bs-dismiss="modal">Close</button>

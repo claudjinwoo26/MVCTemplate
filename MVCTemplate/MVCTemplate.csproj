@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <Folder Include="Areas\User\" />
+    <Folder Include="Middleware\" />
   </ItemGroup>
 
 </Project>
