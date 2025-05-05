@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using MVCTemplate.Util;
 using MVCTemplate.DataAccess.Repository.IRepository;
 using MVCTemplate.Models;
+using Microsoft.AspNetCore.Mvc.Abstractions;
 namespace MVCTemplate.Areas.Admin.Controllers
 {
     [Authorize(Roles = $"{Roles.Admin}, {Roles.User}")]
@@ -22,7 +23,7 @@ namespace MVCTemplate.Areas.Admin.Controllers
             return View();
         }
 
-        public IActionResult Create(Models.Product product) 
+        public IActionResult Create(Product product) 
         {
             try
             {
@@ -51,6 +52,44 @@ namespace MVCTemplate.Areas.Admin.Controllers
             catch (InvalidOperationException)
             {
                 return BadRequest(new { message = "Invalid Operation" });
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { message = "An unexpected error occurred" });
+            }
+        }
+
+        public IActionResult Update(Product obj)
+        {
+            try
+            {
+                obj.GenerateUpdatedAt();
+                Product? product = _unitOfWork.Product.ContinueIfNoChangeOnUpdate(obj.Name, obj.Id);
+
+                if (product != null) 
+                {
+                    ModelState.AddModelError("Name", "Product Name Already exists");
+                }
+                if (ModelState.IsValid) 
+                {
+                    _unitOfWork.Product.Update(obj);
+                    _unitOfWork.Save();
+                    return Ok(new { message = "Updated Successfully" });
+                }
+                var errors = ModelState.ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value?.Errors?.Select(e => e.ErrorMessage)?.ToArray() ?? []);
+
+                return BadRequest(new { errors, message = "Something went wrong!" });
+                
+            }
+            catch (DbUpdateException)
+            {
+                return BadRequest(new { message = "Error occurred while saving to database" });
+            }
+            catch (InvalidOperationException)
+            {
+                return BadRequest(new { message = "Invalid operation" });
             }
             catch (Exception)
             {
