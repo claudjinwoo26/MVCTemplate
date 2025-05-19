@@ -1,0 +1,143 @@
+﻿@model Category
+
+@{
+    ViewData["Title"] = "Category";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+
+<div class="app-main__inner">
+    <div class="app-page-title">
+        <div class="page-title-wrapper">
+            <div class="page-title-heading">
+                <div class="page-title-icon">
+                    <i class="lnr-bookmark icon-gradient bg-premium-dark"></i>
+                </div>
+                <div>
+                    <span class="text-primary"><b>Category</b></span>
+                </div>
+            </div>
+            <div class="page-title-actions">
+                <div class="d-inline-block dropdown">
+
+                    <button type="button" class="btn-shadow btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
+                        + Add Category
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="main-card mb-3 card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table style="width: 100%;" id="categoryTable" class="table table-hover table-striped table-bordered display nowrap">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>ID</th>
+                            <th>Code</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Modal
+{
+
+    @* Create Modal*@
+    <div class="modal fade" id="createModal" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <form asp-action="Create" asp-controller="Category" method="post" id="createForm">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label asp-for="IdCategory" class="control-label">Category ID<span class="text-danger">*</span></label>
+                            <input asp-for="IdCategory" class="form-control" />
+                            <span asp-validation-for="IdCategory" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="NameCategory" class="control-label">Category Name<span class="text-danger">*</span></label>
+                            <input asp-for="NameCategory" class="form-control" />
+                            <span asp-validation-for="NameCategory" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="CodeCategory" class="control-label">Category Code<span class="text-danger">*</span></label>
+                            <input asp-for="CodeCategory" class="form-control" />
+                            <span asp-validation-for="CodeCategory" class="text-danger"></span>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn-shadow btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button id="createAddFormSubmitBtn" class="ladda-button  me-2 btn-shadow btn btn-primary" data-style="expand-left">
+                                <span class="ladda-label">Save Information</span>
+                                <span class="ladda-spinner"></span>
+                            </button>
+                        </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    @* Update Modal *@
+    <div class="modal fade" id="updateModal" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Update Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <form asp-action="Update" asp-controller="Product" method="put" id="updateForm">
+                    <div class="modal-body">
+                        <input type="hidden" asp-for="IdCategory" id="CategoryId" />
+                        <div class="form-group">
+                            <label asp-for="NameCategory" class="control-label">Category Name:<span class="text-danger">*</span></label>
+                            <input asp-for="NameCategory" class="form-control" id="name" />
+                            <span asp-validation-for="NameCategory" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="IdCategory" class="control-label">Category ID:<span class="text-danger">*</span></label>
+                            <input asp-for="IdCategory" class="form-control" id="name" />
+                            <span asp-validation-for="IdCategory" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="CodeCategory" class="control-label">Category Code<span class="text-danger">*</span></label>
+                            <input asp-for="CodeCategory" class="form-control" />
+                            <span asp-validation-for="CodeCategory" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn-shadow btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button id="createEditFormSubmitBtn" class="ladda-button  me-2 btn-shadow btn btn-primary" data-style="expand-left">
+                            <span class="ladda-label">Save Changes</span>
+                            <span class="ladda-spinner"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+}
+@section Scripts {
+    <script src="~/js/validation.js"></script>
+    <script src="~/js/formSubmissionAjax.js"></script>
+    <script src="~/js/ProductScripts/product-data-table.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+
+}
