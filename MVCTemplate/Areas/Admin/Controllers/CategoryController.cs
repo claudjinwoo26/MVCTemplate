@@ -11,19 +11,7 @@ namespace MVCTemplate.Areas.Admin.Controllers
     [Area("Admin")]
     public class CategoryController : Controller
     {
-        //private readonly ILogger<CategoryController> _logger;
-
-        //public CategoryController(ILogger<CategoryController> logger)
-        //{
-        //    _logger = logger;
-        //}
-
         public IActionResult Index()
-        {
-            return View();
-        }
-
-        public IActionResult Privacy()
         {
             return View();
         }
@@ -40,7 +28,7 @@ namespace MVCTemplate.Areas.Admin.Controllers
 
         public IActionResult GetAllCategory()
         {
-            List<Category>? categoryList = _unitOfWork.Category.GetAll().ToList();
+            List<Category>? categoryList = _unitOfWork.Category.GetAll().ToList(); // not implemented
             return Json(new { data = categoryList });
         }
 

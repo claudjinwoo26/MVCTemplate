@@ -1,5 +1,6 @@
 ﻿
 using MVCTemplate.Models;
+using System.Linq.Expressions;
 
 namespace MVCTemplate.DataAccess.Repository.IRepository
 {
@@ -12,5 +13,7 @@ namespace MVCTemplate.DataAccess.Repository.IRepository
         Category? CheckIfUnique(string name);
 
         Category? ContinueIfNoChangeOnUpdate(string name, int countryId);
+
+        Category GetFirstOrDefault(Expression<Func<Category, bool>> predicate);
     }
 }

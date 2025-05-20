@@ -54,14 +54,14 @@ namespace MVCTemplate.DataAccess.Repository
             _db.Categorys.Update(category);
         }
 
-        public IEnumerable<Category> GetAll(string? includeProperties)
+        public void RemoveRange(IEnumerable<Product> entity)
         {
             throw new NotImplementedException();
         }
 
-        public void RemoveRange(IEnumerable<Product> entity)
+        public Category GetFirstOrDefault(Expression<Func<Category, bool>> predicate)
         {
-            throw new NotImplementedException();
+            return _db.Categorys.FirstOrDefault(predicate);
         }
     }
 }

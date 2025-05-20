@@ -52,7 +52,7 @@ $(document).ready(function () {
             //Show Alert
             toastr.success(response.message);
             //Refresh Data Table
-            dataTable.ajax.reload();
+            dataTable.ajax.reload(); // to be used to avoid datatable reinitailization 
             //Reset Form
             $('#updateForm')[0].reset();
             //Hide Modal
