@@ -1,11 +1,11 @@
-﻿
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MVCTemplate.Util;
 using MVCTemplate.DataAccess.Repository.IRepository;
 using MVCTemplate.Models;
 using Microsoft.AspNetCore.Mvc.Abstractions;
+
 namespace MVCTemplate.Areas.Admin.Controllers
 {
     [Authorize(Roles = $"{Roles.Admin}, {Roles.User}")]
@@ -23,17 +23,17 @@ namespace MVCTemplate.Areas.Admin.Controllers
             return View();
         }
 
-        public IActionResult Create(Product product) 
+        public IActionResult Create(Product product)
         {
             try
             {
                 Models.Product? productCheck = _unitOfWork.Product.CheckIfUnique(product.Name);
-                if (productCheck != null) 
+                if (productCheck != null)
                 {
                     ModelState.AddModelError("Name", "Product already exists");
                 }
 
-                if (ModelState.IsValid) 
+                if (ModelState.IsValid)
                 {
                     _unitOfWork.Product.Add(product);
                     _unitOfWork.Save();
@@ -66,11 +66,11 @@ namespace MVCTemplate.Areas.Admin.Controllers
                 obj.GenerateUpdatedAt();
                 Product? product = _unitOfWork.Product.ContinueIfNoChangeOnUpdate(obj.Name, obj.Id);
 
-                if (product != null) 
+                if (product != null)
                 {
                     ModelState.AddModelError("Name", "Product Name Already exists");
                 }
-                if (ModelState.IsValid) 
+                if (ModelState.IsValid)
                 {
                     _unitOfWork.Product.Update(obj);
                     _unitOfWork.Save();
@@ -81,7 +81,7 @@ namespace MVCTemplate.Areas.Admin.Controllers
                     kvp => kvp.Value?.Errors?.Select(e => e.ErrorMessage)?.ToArray() ?? []);
 
                 return BadRequest(new { errors, message = "Something went wrong!" });
-                
+
             }
             catch (DbUpdateException)
             {
@@ -98,13 +98,42 @@ namespace MVCTemplate.Areas.Admin.Controllers
         }
 
         #region API Calls
-        [HttpGet]
 
+        [HttpGet]
         public IActionResult GetAllProducts()
         {
             List<Product>? productList = _unitOfWork.Product.GetAll().ToList();
             return Json(new { data = productList });
         }
+
+        // Step 1: Add DELETE API Method for Product Deletion
+        [HttpDelete] //Url and Id removed
+        public IActionResult Delete(int id)
+        {
+            try
+            {
+                // Step 2: Retrieve the product to be deleted
+                var product = _unitOfWork.Product.GetFirstOrDefault(p => p.Id == id); // product and iproduct repositories had to be updated
+
+                // Step 3: Check if the product exists
+                if (product == null)
+                {
+                    return Json(new { success = false, message = "Product not found" });
+                }
+
+                // Step 4: Delete the product
+                _unitOfWork.Product.Remove(product);
+                _unitOfWork.Save();
+
+                // Step 5: Return success response
+                return Json(new { success = true, message = "Product deleted successfully" });
+            }
+            catch (Exception)
+            {
+                return Json(new { success = false, message = "An unexpected error occurred while deleting the product" });
+            }
+        }
+
         #endregion
     }
 }
