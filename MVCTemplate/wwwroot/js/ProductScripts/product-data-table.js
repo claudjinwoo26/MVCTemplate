@@ -2,30 +2,6 @@ $(document).ready(function () {
     loadDataTable();
 });
 
-/*
-// Step 1: Define the Delete function
-function Delete(url) { //function name needs to be consistent with controller
-    // Confirm deletion before proceeding
-    if (confirm('Are you sure you want to delete this product?')) {
-        $.ajax({
-            url: url,        // The URL to call (this should include the product ID)
-            type: 'DELETE',  // Method to delete the product
-            success: function (response) {
-                if (response.success) {
-                    // Reload the DataTable or remove the deleted row
-                    //$('#productTable').DataTable().ajax.reload(); - error
-                    dataTable.ajax.reload();
-                    alert('Product deleted successfully');
-                } else {
-                    alert('Error deleting product');
-                }
-            },
-            error: function (xhr, status, error) {
-                alert('An error occurred while deleting the product');
-            }
-        });
-    }
-}OLD DELETE*/
 
 // Step 2: Define the DataTable and rendering logic
 
