@@ -1,9 +1,11 @@
-﻿using MVCtemplate.DataAccess.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using MVCtemplate.DataAccess.Data;
 using MVCTemplate.DataAccess.Repository.IRepository;
 using MVCTemplate.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -27,9 +29,15 @@ namespace MVCTemplate.DataAccess.Repository
             return _db.Products.FirstOrDefault(i => i.Name == name && i.Id != countryId);
         }
 
+        public Product GetFirstOrDefault(Expression<Func<Product, bool>> predicate)
+        {
+            return _db.Products.FirstOrDefault(predicate);
+        } //since it cant be in interface repository
+
         public void Update(Product product)
         {
             _db.Products.Update(product);
         }
+
     }
 }

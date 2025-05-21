@@ -1,41 +1,43 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MVCTemplate.Util;
 using MVCTemplate.DataAccess.Repository.IRepository;
 using MVCTemplate.Models;
-using Microsoft.AspNetCore.Mvc.Abstractions;
+using MVCTemplate.Util;
+using System.Diagnostics;
 
 namespace MVCTemplate.Areas.Admin.Controllers
 {
-    [Authorize(Roles = $"{Roles.Admin}, {Roles.User}")]
+    [Authorize(Roles = $"{Roles.Admin}")]
     [Area("Admin")]
-    public class ProductController : Controller
+    public class CategoryController : Controller
     {
-        private IUnitOfWork _unitOfWork;
-        public ProductController(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
-
         public IActionResult Index()
         {
             return View();
         }
-        [HttpPost]
-        public IActionResult Create(Product product)
+
+        private IUnitOfWork _unitOfWork;
+
+        public CategoryController(IUnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+        }
+
+        public IActionResult Create(Category category)
         {
             try
             {
-                Models.Product? productCheck = _unitOfWork.Product.CheckIfUnique(product.Name);
+                Models.Category? productCheck = _unitOfWork.Category.CheckIfUnique(category.NameCategory);
                 if (productCheck != null)
                 {
-                    ModelState.AddModelError("Name", "Product already exists");
+                    ModelState.AddModelError("Name", "Category already exists");
                 }
 
                 if (ModelState.IsValid)
                 {
-                    _unitOfWork.Product.Add(product);
+                    _unitOfWork.Category.Add(category);
                     _unitOfWork.Save();
                     return Ok(new { message = "Added Successfully" });
                 }
@@ -54,25 +56,26 @@ namespace MVCTemplate.Areas.Admin.Controllers
                 return BadRequest(new { message = "Invalid Operation" });
             }
             catch (Exception)
+
             {
                 return BadRequest(new { message = "An unexpected error occurred" });
             }
         }
         [HttpPut]
-        public IActionResult Update(Product obj)
+        public IActionResult Update(Category obj)
         {
             try
             {
                 obj.GenerateUpdatedAt();
-                Product? product = _unitOfWork.Product.ContinueIfNoChangeOnUpdate(obj.Name, obj.Id);
+                Category? category = _unitOfWork.Category.ContinueIfNoChangeOnUpdate(obj.NameCategory, obj.IdCategory);
 
-                if (product != null)
+                if (category != null)
                 {
-                    ModelState.AddModelError("Name", "Product Name Already exists");
+                    ModelState.AddModelError("Name", "Category Name Already exists");
                 }
                 if (ModelState.IsValid)
                 {
-                    _unitOfWork.Product.Update(obj);
+                    _unitOfWork.Category.Update(obj);
                     _unitOfWork.Save();
                     return Ok(new { message = "Updated Successfully" });
                 }
@@ -80,7 +83,7 @@ namespace MVCTemplate.Areas.Admin.Controllers
                     kvp => kvp.Key,
                     kvp => kvp.Value?.Errors?.Select(e => e.ErrorMessage)?.ToArray() ?? []);
 
-                return BadRequest(new { errors, message = "Something went wrong!" });
+                return BadRequest(new { errors, message = "Something went wrong!" }); // missing ID
 
             }
             catch (DbUpdateException)
@@ -105,16 +108,16 @@ namespace MVCTemplate.Areas.Admin.Controllers
             {
                 if (id == 0)
                 {
-                    return BadRequest(new { message = "Product Id not found" });
+                    return BadRequest(new { message = "Category Id not found" });
                 }
 
-                Product product = _unitOfWork.Product.Get(u => u.Id == id);
-                if (product == null)
+                Category category = _unitOfWork.Category.Get(u => u.IdCategory == id);
+                if (category == null)
                 {
-                    return BadRequest(new { message = "Product Id not found" });
+                    return BadRequest(new { message = "Category Id not found" });
                 }
 
-                _unitOfWork.Product.Remove(product);
+                _unitOfWork.Category.Remove(category);
                 _unitOfWork.Save();
                 return Ok(new { message = "Category deleted successfully" });
             }
@@ -128,45 +131,17 @@ namespace MVCTemplate.Areas.Admin.Controllers
             }
         }
 
+
         #region API Calls
-
         [HttpGet]
-        public IActionResult GetAllProducts()
+
+        public IActionResult GetAllCategory()
         {
-            List<Product>? productList = _unitOfWork.Product.GetAll().ToList();
-            return Json(new { data = productList });
+            List<Category>? categoryList = _unitOfWork.Category.GetAll().ToList();
+            return Json(new { data = categoryList });
         }
-
-        /*
-        // Step 1: Add DELETE API Method for Product Deletion
-        [HttpDelete]
-        public IActionResult Delete(int id)
-        {
-            try
-            {
-                // Step 2: Retrieve the product to be deleted
-                var product = _unitOfWork.Product.GetFirstOrDefault(p => p.Id == id); // product and iproduct repositories had to be updated
-
-                // Step 3: Check if the product exists
-                if (product == null)
-                {
-                    return Json(new { success = false, message = "Product not found" });
-                }
-
-                // Step 4: Delete the product
-                _unitOfWork.Product.Remove(product);
-                _unitOfWork.Save();
-
-                // Step 5: Return success response
-                return Json(new { success = true, message = "Product deleted successfully" });
-            }
-            catch (Exception)
-            {
-                return Json(new { success = false, message = "An unexpected error occurred while deleting the product" });
-            }
-        } OLD DELETE
-        */
-
+       
         #endregion
+
     }
 }
