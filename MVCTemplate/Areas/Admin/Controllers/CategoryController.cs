@@ -83,7 +83,7 @@ namespace MVCTemplate.Areas.Admin.Controllers
                     kvp => kvp.Key,
                     kvp => kvp.Value?.Errors?.Select(e => e.ErrorMessage)?.ToArray() ?? []);
 
-                return BadRequest(new { errors, message = "Something went wrong!" }); // missing ID
+                return BadRequest(new { errors, message = "Something went wrong!" });
 
             }
             catch (DbUpdateException)

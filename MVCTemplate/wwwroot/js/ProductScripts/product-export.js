@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
 */
 
 document.querySelector("#button-excel").addEventListener("click", async function () {
-    var table = $('#Products').DataTable(); // change to account for the name of the class (Model)
+    var table = $('#Products').DataTable(); // ??change to account for the name in ApplicationDbContext
     var searchValue = table.search();
     var dataToExport;
 
@@ -27,12 +27,12 @@ document.querySelector("#button-excel").addEventListener("click", async function
         dataToExport = result.data;
     }
 
-    dataToExport.sort((a, b) => a.name.localeCompare(b.name));
+    dataToExport.sort((a, b) => a.name.localeCompare(b.name)); // ^ change to account for name of data (Model)
 
     let tempTable = document.createElement('table');
     let thead = document.createElement('thead');
     thead.innerHTML = '<tr><th>ID</th> <th>Name</th> <th>Description</th> <th>Quantity</th> </tr>'; 
-    tempTable.appendChild(thead); // ^ change to account for name of data (Model) and number of column 
+    tempTable.appendChild(thead);
 
     let tbody = document.createElement('tbody');
     dataToExport.forEach(row => {
