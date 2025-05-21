@@ -1,4 +1,5 @@
-﻿using MVCtemplate.DataAccess.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using MVCtemplate.DataAccess.Data;
 using MVCTemplate.DataAccess.Repository.IRepository;
 using MVCTemplate.Models;
 using System;
@@ -14,54 +15,29 @@ namespace MVCTemplate.DataAccess.Repository
     {
         private readonly ApplicationDbContext _db;
 
-        public CategoryRepository(ApplicationDbContext db) : base(db)
+        public CategoryRepository(ApplicationDbContext db) : base(db) 
         {
             _db = db;
         }
 
-        public void Add(Category entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Category? CheckIfUnique(string name)
+        public Category? CheckIfUnique(string name) 
         {
             return _db.Categorys.FirstOrDefault(i => i.NameCategory == name);
         }
 
-        public Category? ContinueIfNoChangeOnUpdate(string name, int countryId)
+        public Category? ContinueIfNoChangeOnUpdate(string name, int categoryId)
         {
-            return _db.Categorys.FirstOrDefault(i => i.NameCategory == name && i.IdCategory != countryId);
-        }
-
-        public void Delete(Category entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Category Get(Expression<Func<Category, bool>> filter, string? includeProperties = null)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void RemoveRange(IEnumerable<Category> entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Update(Category category)
-        {
-            _db.Categorys.Update(category);
-        }
-
-        public void RemoveRange(IEnumerable<Product> entity)
-        {
-            throw new NotImplementedException();
+            return _db.Categorys.FirstOrDefault(i => i.NameCategory == name && i.IdCategory != categoryId);
         }
 
         public Category GetFirstOrDefault(Expression<Func<Category, bool>> predicate)
         {
             return _db.Categorys.FirstOrDefault(predicate);
+        }
+
+        public void Update(Category category)
+        {
+            _db.Categorys.Update(category);
         }
     }
 }

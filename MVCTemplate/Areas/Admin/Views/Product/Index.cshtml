@@ -125,20 +125,20 @@
                 </div>
                 <form asp-action="Update" asp-controller="Product" method="put" id="updateForm">
                     <div class="modal-body">
-                        <input type="hidden" asp-for="Id" id="productId" />
+                        <input type="hidden" asp-for="Id" id="productId" /> @*id must be same with data-table and asp-for must be same for Model*@
                         <div class="form-group">
                             <label asp-for="Name" class="control-label">Product Name:<span class="text-danger">*</span></label>
-                            <input asp-for="Name" class="form-control" id="name" />
+                            <input asp-for="Name" class="form-control" id="name" /> @*same here*@
                             <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
                         <div class="form-group">
                             <label asp-for="Description" class="control-label">Product Description</label>
-                            <input asp-for="Description" class="form-control" id="description"/>
-                            <span asp-validation-for="Description" class="text-danger"></span>
+                            <input asp-for="Description" class="form-control" id="description" /> @*same here*@
+                            <span asp-validation-for="Description" class="text-danger"></span> 
                         </div>
                         <div class="form-group">
                             <label asp-for="Quantity" class="control-label">Product Quantity<span class="text-danger">*</span></label>
-                            <input asp-for="Quantity" type="number" class="form-control" id="quantity"/>
+                            <input asp-for="Quantity" type="number" class="form-control" id="quantity" /> @*same here*@
                             <span asp-validation-for="Quantity" class="text-danger"></span>
                         </div>
                     </div>
@@ -196,5 +196,6 @@
     <script src="~/js/formSubmissionAjax.js"></script>
     <script src="~/js/ProductScripts/product-data-table.js"></script>
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/deleteGeneralSettings.js"></script>
     
 }

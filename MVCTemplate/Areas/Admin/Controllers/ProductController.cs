@@ -22,7 +22,7 @@ namespace MVCTemplate.Areas.Admin.Controllers
         {
             return View();
         }
-
+        [HttpPost]
         public IActionResult Create(Product product)
         {
             try
@@ -58,7 +58,7 @@ namespace MVCTemplate.Areas.Admin.Controllers
                 return BadRequest(new { message = "An unexpected error occurred" });
             }
         }
-
+        [HttpPut]
         public IActionResult Update(Product obj)
         {
             try
@@ -97,6 +97,37 @@ namespace MVCTemplate.Areas.Admin.Controllers
             }
         }
 
+        [HttpDelete]
+
+        public IActionResult Delete(int id)
+        {
+            try
+            {
+                if (id == 0)
+                {
+                    return BadRequest(new { message = "Product Id not found" });
+                }
+
+                Product product = _unitOfWork.Product.Get(u => u.Id == id);
+                if (product == null)
+                {
+                    return BadRequest(new { message = "Product Id not found" });
+                }
+
+                _unitOfWork.Product.Remove(product);
+                _unitOfWork.Save();
+                return Ok(new { message = "Category deleted successfully" });
+            }
+            catch (DbUpdateException)
+            {
+                return BadRequest(new { message = "Unable to delete data because it is being used in another table" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
         #region API Calls
 
         [HttpGet]
@@ -106,8 +137,9 @@ namespace MVCTemplate.Areas.Admin.Controllers
             return Json(new { data = productList });
         }
 
+        /*
         // Step 1: Add DELETE API Method for Product Deletion
-        [HttpDelete] //Url and Id removed
+        [HttpDelete]
         public IActionResult Delete(int id)
         {
             try
@@ -132,7 +164,8 @@ namespace MVCTemplate.Areas.Admin.Controllers
             {
                 return Json(new { success = false, message = "An unexpected error occurred while deleting the product" });
             }
-        }
+        } OLD DELETE
+        */
 
         #endregion
     }

@@ -2,8 +2,9 @@ $(document).ready(function () {
     loadDataTable();
 });
 
+/*
 // Step 1: Define the Delete function
-function Delete(url) {
+function Delete(url) { //function name needs to be consistent with controller
     // Confirm deletion before proceeding
     if (confirm('Are you sure you want to delete this product?')) {
         $.ajax({
@@ -24,7 +25,7 @@ function Delete(url) {
             }
         });
     }
-}
+}OLD DELETE*/
 
 // Step 2: Define the DataTable and rendering logic
 
