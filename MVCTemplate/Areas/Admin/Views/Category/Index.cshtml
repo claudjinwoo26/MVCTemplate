@@ -3,13 +3,6 @@
 @{
     ViewData["Title"] = "Category";
 }
-
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
-
-
 <div class="app-main__inner">
     <div class="app-page-title">
         <div class="page-title-wrapper">
@@ -23,6 +16,10 @@
             </div>
             <div class="page-title-actions">
                 <div class="d-inline-block dropdown">
+                    <button id="button-excel" class="btn btn-success">
+                        <i class="fa-regular fa-file-excel" style="color: #ffffff;"></i>
+                        Export
+                    </button>
 
                     <button type="button" class="btn-shadow btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
                         + Add Category
@@ -130,5 +127,6 @@
     <script src="~/js/CategoryScripts/category-data-table.js"></script>
     <partial name="_ValidationScriptsPartial" />
     <script src="~/js/deleteGeneralSettings.js"></script>
+    <script src="~/js/CategoryScripts/category-export.js"></script>
 
 }
