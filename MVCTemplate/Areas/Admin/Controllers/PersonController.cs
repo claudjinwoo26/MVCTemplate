@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using MVCTemplate.DataAccess.Repository.IRepository;
 using MVCTemplate.Models;
@@ -149,10 +150,10 @@ namespace MVCTemplate.Areas.Admin.Controllers
                 }
 
                 _unitOfWork.Person.Remove(person);
-                _unitOfWork.Save();
+                //_unitOfWork.Save();
                 return Ok(new { message = "Person deleted successfully" });
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx && sqlEx.Number == 547)
             {
                 return BadRequest(new { message = "Unable to delete data because it is being used in another table" });
             }

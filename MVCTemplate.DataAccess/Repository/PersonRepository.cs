@@ -64,10 +64,10 @@ namespace MVCTemplate.DataAccess.Repository
             throw new NotImplementedException();
         }
 
-        public void Remove(Person category)
+        public void Remove(Person person)
         {
-            _db.Set<Person>().Remove(category);
-            _db.SaveChanges();
+            _db.Set<Person>().Remove(person);
+            // _db.SaveChanges();
         }
 
         public void RemoveRange(IEnumerable<Person> entity)
