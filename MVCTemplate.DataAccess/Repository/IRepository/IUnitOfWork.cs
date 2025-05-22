@@ -6,5 +6,6 @@ public interface IUnitOfWork
 
     ICategoryRepository Category { get; }
     IPersonRepository Person { get; }
+    IPackageRepository Package { get; }
     void Save();
 }

@@ -11,6 +11,7 @@ namespace MVCTemplate.DataAccess.Repository
 
         public ICategoryRepository Category { get; private set; }
         public IPersonRepository Person { get; private set; }
+        public IPackageRepository Package { get; private set; }
 
         public UnitOfWork(ApplicationDbContext db)
         {

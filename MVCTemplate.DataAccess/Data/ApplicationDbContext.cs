@@ -13,6 +13,7 @@ namespace MVCtemplate.DataAccess.Data
         public DbSet<Product> Products { get; set; }
         public DbSet<Category> Categorys { get; set; }
         public DbSet<Person> Persons { get; set; }
+        public DbSet<Package> Packages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
