@@ -11,17 +11,17 @@ document.querySelector("#button-excel-person").addEventListener("click", async f
         dataToExport = result.data;
     }
 
-    dataToExport.sort((a, b) => a.name.localeCompare(b.name)); // ^ change to account for name of data (Model)
+    dataToExport.sort((a, b) => a.name.localeCompare(b.name)); // change to account for name of data (Model)
 
     let tempTable = document.createElement('table');
     let thead = document.createElement('thead');
-    thead.innerHTML = '<tr><th>ID</th> <th>Name</th> <th>Position</th></tr>';
+    thead.innerHTML = '<tr><th>ID</th> <th>Name</th> <th>Position</th> <th>CategoryId</th></tr>';
     tempTable.appendChild(thead);
 
     let tbody = document.createElement('tbody');
     dataToExport.forEach(row => {
         let tr = document.createElement('tr');
-        tr.innerHTML = `<td>${row.id}</td> <td>${row.name}</td> <td>${row.position}</td>`;
+        tr.innerHTML = `<td>${row.id}</td> <td>${row.name}</td> <td>${row.position}</td> <td>${row.categoryId}</td>`;
         tbody.appendChild(tr); // ^ change to account for name of data (Model) and number of column 
     });
     tempTable.appendChild(tbody);

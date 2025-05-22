@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MVCTemplate.DataAccess.Repository.IRepository;
 using MVCTemplate.Models;
 using MVCTemplate.Util;
+using MVCTemplate.ViewModels;
 using System.Diagnostics;
 
 namespace MVCTemplate.Areas.Admin.Controllers
@@ -15,7 +17,16 @@ namespace MVCTemplate.Areas.Admin.Controllers
     {
         public IActionResult Index()
         {
-            return View();
+            PersonVM personVM = new()
+            {
+                CategoryList = _unitOfWork.Category.GetAll().Select(u => new SelectListItem
+                {
+                    Text = u.NameCategory,
+                    Value = u.IdCategory.ToString()
+                }),
+                Person = new Person()
+            };
+            return View(personVM);
         }
 
         private IUnitOfWork _unitOfWork;
@@ -25,6 +36,26 @@ namespace MVCTemplate.Areas.Admin.Controllers
             _unitOfWork = unitOfWork;
         }
 
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        public IActionResult Update()
+        {
+            IEnumerable<SelectListItem> CategoryList = _unitOfWork.Category
+               .GetAll().Select(u => new SelectListItem
+               {
+                   Text = u.NameCategory,
+                   Value = u.IdCategory.ToString()
+               });
+
+            ViewBag.CategoryList = CategoryList;
+            //not working
+            return View();
+        }
+
+        [HttpPost]
         public IActionResult Create(Person person)
         {
             try
@@ -137,10 +168,11 @@ namespace MVCTemplate.Areas.Admin.Controllers
 
         public IActionResult GetAllPersons()
         {
-            List<Person>? personList = _unitOfWork.Person.GetAll().ToList(); //not implemented
+            
+            List<Person>? personList = _unitOfWork.Person.GetAll().ToList();
             return Json(new { data = personList });
         }
-       
+
         #endregion
 
     }

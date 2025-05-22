@@ -19,7 +19,7 @@ namespace MVCTemplate.Models
 
         public int CategoryId { get; set; } // for foreign key
         [ForeignKey("CategoryId")]
-        public Category Category { get; set; }
+        public Category? Category { get; set; }
 
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
