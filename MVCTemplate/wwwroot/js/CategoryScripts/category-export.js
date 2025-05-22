@@ -1,3 +1,4 @@
+
 document.querySelector("#button-excel").addEventListener("click", async function () {
     var table = $('#Categorys').DataTable(); // ??change to account for the name in ApplicationDbContext
     var searchValue = table.search();

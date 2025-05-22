@@ -175,7 +175,7 @@ namespace MVCTemplate.Areas.Admin.Controllers
 
                 _unitOfWork.Product.Remove(product);
                 _unitOfWork.Save();
-                return Ok(new { message = "Category deleted successfully" });
+                return Ok(new { message = "Product deleted successfully" });
             }
             catch (DbUpdateException)
             {

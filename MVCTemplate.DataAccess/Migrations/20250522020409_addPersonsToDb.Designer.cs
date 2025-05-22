@@ -4,6 +4,7 @@ using MVCtemplate.DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MVCTemplate.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250522020409_addPersonsToDb")]
+    partial class addPersonsToDb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -130,9 +133,6 @@ namespace MVCTemplate.DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -140,9 +140,6 @@ namespace MVCTemplate.DataAccess.Migrations
                     b.Property<string>("Position")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -152,26 +149,20 @@ namespace MVCTemplate.DataAccess.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 5, 22, 11, 13, 59, 134, DateTimeKind.Local).AddTicks(3622),
                             Name = "Name1",
-                            Position = "E1",
-                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            Position = "E1"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2025, 5, 22, 11, 13, 59, 134, DateTimeKind.Local).AddTicks(3633),
                             Name = "Name2",
-                            Position = "E2",
-                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            Position = "E2"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2025, 5, 22, 11, 13, 59, 134, DateTimeKind.Local).AddTicks(3634),
                             Name = "Name3",
-                            Position = "E3",
-                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            Position = "E3"
                         });
                 });
 
