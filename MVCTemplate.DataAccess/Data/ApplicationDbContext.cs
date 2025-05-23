@@ -18,7 +18,7 @@ namespace MVCtemplate.DataAccess.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            
+            /*
             builder.Entity<Category>().HasData(
                 new Category { IdCategory = 1, NameCategory = "C11", CodeCategory = "11C"},
                 new Category { IdCategory = 2, NameCategory = "C22", CodeCategory = "22C"},
@@ -32,7 +32,7 @@ namespace MVCtemplate.DataAccess.Data
                 new Person { Id = 3, Name = "Name3", Position = "E3", CategoryId = 1 }
 
             );
-
+            */
         }
     }
 }

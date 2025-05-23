@@ -1,7 +1,4 @@
-﻿@*
-   Razor View
-*@
-
+﻿
 @*
 @if(!string.IsNullorEmpty(ViewBag.Message) && ViewBag.Message == "success")
 {
@@ -14,9 +11,7 @@ else if (!string.IsNullorEmpty(ViewBag.Message) && ViewBag.Message == "empty")
     <div class="alert alert-warning" role="alert">
         File is empty
     </div>
-
-    errors
-}*@
+} ERROR *@
 
 <form method="post" enctype="multipart/form-data">
     <div class="row">
@@ -29,3 +24,13 @@ else if (!string.IsNullorEmpty(ViewBag.Message) && ViewBag.Message == "empty")
     </div>
 </form>
 
+<form method="post" enctype="multipart/form-data">
+    <div class="row">
+        <label>Select Excel File</label>
+        <input type="file" name="file" />
+    </div>
+    <br />
+    <div class="row">
+        <input type="submit" asp-controller="Import" asp-action="UploadExcelProduct" class="btn btn-dark" value="Upload Product Excel File" />
+    </div>
+</form>
