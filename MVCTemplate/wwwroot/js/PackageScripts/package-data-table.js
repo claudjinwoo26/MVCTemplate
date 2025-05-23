@@ -1,10 +1,10 @@
 $(document).ready(function () {
-    loadDataTable();
+    loadDataTablePackage();
 });
 
 
-function loadDataTable() {
-    dataTable = $('#packageTable').DataTable({ // ensure naming consistency
+function loadDataTablePackage() {
+    dataTable = $('#packageTable').DataTable({ // ensure naming consistency with corresponding index.cshtml
         "ajax": { url: '/Admin/Package/GetAllPackages' },
         "columns": [
             { data: 'name', "autowidth": true },

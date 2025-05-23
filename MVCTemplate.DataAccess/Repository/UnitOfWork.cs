@@ -19,6 +19,7 @@ namespace MVCTemplate.DataAccess.Repository
             Product = new ProductRepository(_db);
             Category = new CategoryRepository(_db);
             Person = new PersonRepository(_db);
+            Package = new PackageRepository(_db);
         }
 
         public void Save()
