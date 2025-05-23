@@ -7,6 +7,7 @@ using MVCtemplate.DataAccess.Data;
 using MVCTemplate.DataAccess.Repository.IRepository;
 using MVCTemplate.Models;
 using MVCTemplate.Util;
+using OfficeOpenXml;
 using System.Diagnostics;
 using System.Text;
 
@@ -28,6 +29,82 @@ namespace MVCTemplate.Areas.Admin.Controllers
         {
             _unitOfWork = unitOfWork;
         }
+
+        public IActionResult Import()
+        {
+            return View();
+        } // for the import modal
+
+        [HttpPost]
+        public IActionResult Import(IFormFile file) // this code assumes there is no ID column in the excel file
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest(new { message = "No file uploaded." });
+
+            try
+            {
+                ExcelPackage.License.SetNonCommercialPersonal("My Name");
+
+                using var package = new ExcelPackage(file.OpenReadStream());
+                var worksheet = package.Workbook.Worksheets.FirstOrDefault();
+                if (worksheet == null)
+                    return BadRequest(new { message = "Invalid Excel file." });
+
+                var packagesToAdd = new List<Package>();
+                int rowCount = worksheet.Dimension.Rows;
+
+                for (int row = 2; row <= rowCount; row++) // assuming row 1 is header
+                {
+                    string? name = worksheet.Cells[row, 1].Text.Trim();
+                    string? description = worksheet.Cells[row, 2].Text.Trim();
+                    string? priorityText = worksheet.Cells[row, 3].Text.Trim();
+
+                    if (string.IsNullOrEmpty(name))
+                        continue; // skip empty rows
+
+                    if (!int.TryParse(priorityText, out int priority))
+                        continue; // skip rows with invalid priority
+                    
+                    var existing = _unitOfWork.Package.CheckIfUnique(name);
+                    if (existing != null)
+                        continue; // skip duplicates
+
+                    var newPackage = new Package
+                    {
+                        Name = name,
+                        Description = description,
+                        Priority = priority
+                    };
+
+                    packagesToAdd.Add(newPackage);
+                }
+
+                if (packagesToAdd.Count == 0)
+                    return BadRequest(new { message = "No valid or unique packages found." });
+
+                foreach (var pkg in packagesToAdd)
+                {
+                    _unitOfWork.Package.Add(pkg);
+                }
+
+                _unitOfWork.Save();
+
+                return Ok(new { message = $"{packagesToAdd.Count} packages imported successfully." });
+            }
+            catch (DbUpdateException)
+            {
+                return BadRequest(new { message = "Error occurred while saving to database." });
+            }
+            catch (InvalidOperationException)
+            {
+                return BadRequest(new { message = "Invalid Operation." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "An unexpected error occurred.", detail = ex.Message });
+            }
+        } 
+
 
         public IActionResult Create(Package package)
         {

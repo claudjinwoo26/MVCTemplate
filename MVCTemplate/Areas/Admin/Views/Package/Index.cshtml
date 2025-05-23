@@ -17,7 +17,11 @@
             <div class="page-title-actions">
                 <div class="d-inline-block dropdown">
                     
-                    
+                    <button type="button" class="btn-shadow btn btn-primary" data-bs-toggle="modal" data-bs-target="#importModal">
+                        <i class="fa-regular fa-file-excel" style="color: #ffffff;"></i>
+                        Import
+
+                    </button>
                     
                     <button id="button-excel" class="btn btn-success">
                         <i class="fa-regular fa-file-excel" style="color: #ffffff;"></i>
@@ -92,6 +96,37 @@
             </div>
         </div>
     </div>
+
+    @* Import Modal*@
+    <div class="modal fade" id="importModal" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Import Excel</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <form asp-action="Import" asp-controller="Package" method="post" enctype="multipart/form-data" id="importForm">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="file" class="control-label">File <span class="text-danger">*</span></label>
+                            <input type="file" name="file" class="form-control" />
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn-shadow btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button id="importFileSubmitBtn" class="ladda-button  me-2 btn-shadow btn btn-primary" data-style="expand-left">
+                                <span class="ladda-label">Import</span>
+                                <span class="ladda-spinner"></span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 
     @* Update Modal *@
     <div class="modal fade" id="updateModal" tabindex="-1" role="dialog"
