@@ -4,6 +4,7 @@ using MVCtemplate.DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MVCTemplate.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250522020409_addPersonsToDb")]
+    partial class addPersonsToDb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -120,62 +123,6 @@ namespace MVCTemplate.DataAccess.Migrations
                     b.HasKey("IdCategory");
 
                     b.ToTable("Categorys");
-
-                    b.HasData(
-                        new
-                        {
-                            IdCategory = 1,
-                            CodeCategory = "11C",
-                            CreatedAt = new DateTime(2025, 5, 23, 8, 44, 59, 155, DateTimeKind.Local).AddTicks(3142),
-                            NameCategory = "C11",
-                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            IdCategory = 2,
-                            CodeCategory = "22C",
-                            CreatedAt = new DateTime(2025, 5, 23, 8, 44, 59, 155, DateTimeKind.Local).AddTicks(3152),
-                            NameCategory = "C22",
-                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            IdCategory = 3,
-                            CodeCategory = "33C",
-                            CreatedAt = new DateTime(2025, 5, 23, 8, 44, 59, 155, DateTimeKind.Local).AddTicks(3153),
-                            NameCategory = "C23",
-                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        });
-                });
-
-            modelBuilder.Entity("MVCTemplate.Models.Package", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Priority")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Packages");
                 });
 
             modelBuilder.Entity("MVCTemplate.Models.Person", b =>
@@ -186,12 +133,6 @@ namespace MVCTemplate.DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -200,12 +141,7 @@ namespace MVCTemplate.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
 
                     b.ToTable("Persons");
 
@@ -213,29 +149,20 @@ namespace MVCTemplate.DataAccess.Migrations
                         new
                         {
                             Id = 1,
-                            CategoryId = 1,
-                            CreatedAt = new DateTime(2025, 5, 23, 8, 44, 59, 155, DateTimeKind.Local).AddTicks(3338),
                             Name = "Name1",
-                            Position = "E1",
-                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            Position = "E1"
                         },
                         new
                         {
                             Id = 2,
-                            CategoryId = 1,
-                            CreatedAt = new DateTime(2025, 5, 23, 8, 44, 59, 155, DateTimeKind.Local).AddTicks(3340),
                             Name = "Name2",
-                            Position = "E2",
-                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            Position = "E2"
                         },
                         new
                         {
                             Id = 3,
-                            CategoryId = 1,
-                            CreatedAt = new DateTime(2025, 5, 23, 8, 44, 59, 155, DateTimeKind.Local).AddTicks(3341),
                             Name = "Name3",
-                            Position = "E3",
-                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            Position = "E3"
                         });
                 });
 
@@ -436,17 +363,6 @@ namespace MVCTemplate.DataAccess.Migrations
                         .HasForeignKey("UserId");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("MVCTemplate.Models.Person", b =>
-                {
-                    b.HasOne("MVCTemplate.Models.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

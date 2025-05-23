@@ -1,0 +1,36 @@
+﻿
+@*
+@if(!string.IsNullorEmpty(ViewBag.Message) && ViewBag.Message == "success")
+{
+    <div class="alert alert-success" role="alert">
+        All records inserted successfully
+    </div>
+}
+else if (!string.IsNullorEmpty(ViewBag.Message) && ViewBag.Message == "empty")
+{
+    <div class="alert alert-warning" role="alert">
+        File is empty
+    </div>
+} ERROR *@
+
+<form method="post" enctype="multipart/form-data">
+    <div class="row">
+        <label>Select Excel File</label>
+        <input type="file" name="file" />
+    </div>    
+    <br/>
+    <div class="row">
+        <input type="submit" asp-controller="Import" asp-action="UploadExcel" class="btn btn-dark" value="Upload Package Excel File" />
+    </div>
+</form>
+
+<form method="post" enctype="multipart/form-data">
+    <div class="row">
+        <label>Select Excel File</label>
+        <input type="file" name="file" />
+    </div>
+    <br />
+    <div class="row">
+        <input type="submit" asp-controller="Import" asp-action="UploadExcelProduct" class="btn btn-dark" value="Upload Product Excel File" />
+    </div>
+</form>

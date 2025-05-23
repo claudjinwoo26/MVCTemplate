@@ -1,43 +1,75 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using MVCTemplate.DataAccess.Repository.IRepository;
 using MVCTemplate.Models;
 using MVCTemplate.Util;
+using MVCTemplate.ViewModels;
 using System.Diagnostics;
 
 namespace MVCTemplate.Areas.Admin.Controllers
 {
     [Authorize(Roles = $"{Roles.Admin}")]
     [Area("Admin")]
-    public class CategoryController : Controller
+    public class PersonController : Controller
     {
         public IActionResult Index()
         {
-            return View();
+            PersonVM personVM = new()
+            {
+                CategoryList = _unitOfWork.Category.GetAll().Select(u => new SelectListItem
+                {
+                    Text = u.NameCategory,
+                    Value = u.IdCategory.ToString()
+                }),
+                Person = new Person()
+            };
+            return View(personVM);
         }
 
         private IUnitOfWork _unitOfWork;
 
-        public CategoryController(IUnitOfWork unitOfWork)
+        public PersonController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
 
-        public IActionResult Create(Category category)
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        public IActionResult Update()
+        {
+            IEnumerable<SelectListItem> CategoryList = _unitOfWork.Category
+               .GetAll().Select(u => new SelectListItem
+               {
+                   Text = u.NameCategory,
+                   Value = u.IdCategory.ToString()
+               });
+
+            ViewBag.CategoryList = CategoryList;
+            //not working
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Create(Person person)
         {
             try
             {
-                Models.Category? productCheck = _unitOfWork.Category.CheckIfUnique(category.NameCategory);
-                if (productCheck != null)
+                Models.Person? personCheck = _unitOfWork.Person.CheckIfUnique(person.Name);
+                if (personCheck != null)
                 {
                     ModelState.AddModelError("Name", "Category already exists");
                 }
 
                 if (ModelState.IsValid)
                 {
-                    _unitOfWork.Category.Add(category);
+                    _unitOfWork.Person.Add(person);
                     _unitOfWork.Save();
                     return Ok(new { message = "Added Successfully" });
                 }
@@ -55,27 +87,27 @@ namespace MVCTemplate.Areas.Admin.Controllers
             {
                 return BadRequest(new { message = "Invalid Operation" });
             }
-            catch (Exception)
+            catch (Exception) //exception to personrepository
 
             {
                 return BadRequest(new { message = "An unexpected error occurred" });
             }
         }
         [HttpPut]
-        public IActionResult Update(Category obj)
+        public IActionResult Update(Person obj)
         {
             try
             {
                 obj.GenerateUpdatedAt();
-                Category? category = _unitOfWork.Category.ContinueIfNoChangeOnUpdate(obj.NameCategory, obj.IdCategory);
+                Person? person = _unitOfWork.Person.ContinueIfNoChangeOnUpdate(obj.Name, obj.Id);
 
-                if (category != null)
+                if (person != null)
                 {
-                    ModelState.AddModelError("Name", "Category Name Already exists");
+                    ModelState.AddModelError("Name", "Person Name Already exists");
                 }
                 if (ModelState.IsValid)
                 {
-                    _unitOfWork.Category.Update(obj);
+                    _unitOfWork.Person.Update(obj);
                     _unitOfWork.Save();
                     return Ok(new { message = "Updated Successfully" });
                 }
@@ -108,20 +140,20 @@ namespace MVCTemplate.Areas.Admin.Controllers
             {
                 if (id == 0)
                 {
-                    return BadRequest(new { message = "Category Id not found" });
+                    return BadRequest(new { message = "Person Id not found" });
                 }
 
-                Category category = _unitOfWork.Category.Get(u => u.IdCategory == id);
-                if (category == null)
+                Person person = _unitOfWork.Person.Get(u => u.Id == id);
+                if (person == null)
                 {
-                    return BadRequest(new { message = "Category Id not found" });
+                    return BadRequest(new { message = "Person Id not found" });
                 }
 
-                _unitOfWork.Category.Remove(category);
-                _unitOfWork.Save();
-                return Ok(new { message = "Category deleted successfully" });
+                _unitOfWork.Person.Remove(person);
+                //_unitOfWork.Save();
+                return Ok(new { message = "Person deleted successfully" });
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx && sqlEx.Number == 547)
             {
                 return BadRequest(new { message = "Unable to delete data because it is being used in another table" });
             }
@@ -135,12 +167,13 @@ namespace MVCTemplate.Areas.Admin.Controllers
         #region API Calls
         [HttpGet]
 
-        public IActionResult GetAllCategory()
+        public IActionResult GetAllPersons()
         {
-            List<Category>? categoryList = _unitOfWork.Category.GetAll().ToList();
-            return Json(new { data = categoryList });
+            
+            List<Person>? personList = _unitOfWork.Person.GetAll().ToList();
+            return Json(new { data = personList });
         }
-       
+
         #endregion
 
     }

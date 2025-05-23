@@ -1,7 +1,7 @@
-﻿@model Category
+﻿@model PersonVM
 
 @{
-    ViewData["Title"] = "Category";
+    ViewData["Title"] = "Person";
 }
 <div class="app-main__inner">
     <div class="app-page-title">
@@ -11,18 +11,18 @@
                     <i class="lnr-bookmark icon-gradient bg-premium-dark"></i>
                 </div>
                 <div>
-                    <span class="text-primary"><b>Category</b></span>
+                    <span class="text-primary"><b>Person</b></span>
                 </div>
             </div>
             <div class="page-title-actions">
                 <div class="d-inline-block dropdown">
-                    <button id="button-excel" class="btn btn-success">
+                    <button id="button-excel-person" class="btn btn-success">
                         <i class="fa-regular fa-file-excel" style="color: #ffffff;"></i>
                         Export
                     </button>
 
                     <button type="button" class="btn-shadow btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
-                        + Add Category
+                        + Add Person
                     </button>
                 </div>
             </div>
@@ -31,11 +31,12 @@
     <div class="main-card mb-3 card">
         <div class="card-body">
             <div class="table-responsive">
-                <table style="width: 100%;" id="categoryTable" class="table table-hover table-striped table-bordered display nowrap">
+                <table style="width: 100%;" id="personTable" class="table table-hover table-striped table-bordered display nowrap">
                     <thead>
                         <tr>
                             <th>Name</th>
-                            <th>Code</th>
+                            <th>Position</th>
+                            <th>Category ID</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -55,22 +56,31 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Add Category</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Add Person</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                     </button>
                 </div>
-                <form asp-action="Create" asp-controller="Category" method="post" id="createForm">
+                <form asp-action="Create" asp-controller="Person" method="post" id="createForm">
                     <div class="modal-body">
                         <div class="form-group">
-                            <label asp-for="NameCategory" class="control-label">Category Name<span class="text-danger">*</span></label>
-                            <input asp-for="NameCategory" class="form-control" />
-                            <span asp-validation-for="NameCategory" class="text-danger"></span>
+                            <label asp-for="Name" class="control-label">Person Name<span class="text-danger">*</span></label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
                         <div class="form-group">
-                            <label asp-for="CodeCategory" class="control-label">Category Code<span class="text-danger">*</span></label>
-                            <input asp-for="CodeCategory" class="form-control" />
-                            <span asp-validation-for="CodeCategory" class="text-danger"></span>
+                            <label asp-for="Position" class="control-label">Person Position<span class="text-danger">*</span></label>
+                            <input asp-for="Position" class="form-control" />
+                            <span asp-validation-for="Position" class="text-danger"></span>
                         </div>
+
+                        <div class="form-floating py-2 col-12">
+                            <select asp-for="CategoryId" asp-items="@Model.CategoryList" class="form-select border-0 shadow">
+                                <option disabled selected>--Select Category--</option>
+                            </select>
+                            <label asp-for="CategoryId" class="ms-2"></label>
+                            <span asp-validation-for="CategoryId" class="text-danger"></span>
+                        </div>
+
                         <div class="modal-footer">
                             <button type="button" class="btn-shadow btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button id="createAddFormSubmitBtn" class="ladda-button  me-2 btn-shadow btn btn-primary" data-style="expand-left">
@@ -90,23 +100,32 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Update Category</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Update Person</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                     </button>
                 </div>
-                <form asp-action="Update" asp-controller="Category" method="put" id="updateForm">
+                <form asp-action="Update" asp-controller="Person" method="put" id="updateForm">
                     <div class="modal-body">
-                        <input type="hidden" asp-for="IdCategory" id="idCategory" />
+                        <input type="hidden" asp-for="Id" id="id" />
                         <div class="form-group">
-                            <label asp-for="NameCategory" class="control-label">Category Name:<span class="text-danger">*</span></label>
-                            <input asp-for="NameCategory" class="form-control" id="nameCategory" />
-                            <span asp-validation-for="NameCategory" class="text-danger"></span>
+                            <label asp-for="Name" class="control-label">Person Name:<span class="text-danger">*</span></label>
+                            <input asp-for="Name" class="form-control" id="name" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
                         <div class="form-group">
-                            <label asp-for="CodeCategory" class="control-label">Category Code<span class="text-danger">*</span></label>
-                            <input asp-for="CodeCategory" class="form-control" id="codeCategory" />
-                            <span asp-validation-for="CodeCategory" class="text-danger"></span>
+                            <label asp-for="Position" class="control-label">Person Position<span class="text-danger">*</span></label>
+                            <input asp-for="Position" class="form-control" id="position" />
+                            <span asp-validation-for="Position" class="text-danger"></span>
                         </div>
+
+                        <div class="form-floating py-2 col-12"> @*Viewbag dont work*@
+                            <select asp-for="CategoryId" asp-items="@Model.CategoryList" class="form-select border-0 shadow">
+                                <option disabled selected>--Select Category--</option>
+                            </select>
+                            <label asp-for="CategoryId" class="ms-2"></label>
+                            <span asp-validation-for="CategoryId" class="text-danger"></span>
+                        </div>
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn-shadow btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -124,9 +143,9 @@
 @section Scripts {
     <script src="~/js/validation.js"></script>
     <script src="~/js/formSubmissionAjax.js"></script>
-    <script src="~/js/CategoryScripts/category-data-table.js"></script>
+    <script src="~/js/PersonScripts/person-data-table.js"></script>
     <partial name="_ValidationScriptsPartial" />
     <script src="~/js/deleteGeneralSettings.js"></script>
-    <script src="~/js/CategoryScripts/category-export.js"></script>
+    <script src="~/js/PersonScripts/person-export.js"></script>     
 
 }

@@ -4,6 +4,7 @@ using MVCtemplate.DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MVCTemplate.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250522045104_addForeignKeyForCategoryPersonRelation")]
+    partial class addForeignKeyForCategoryPersonRelation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -126,7 +129,7 @@ namespace MVCTemplate.DataAccess.Migrations
                         {
                             IdCategory = 1,
                             CodeCategory = "11C",
-                            CreatedAt = new DateTime(2025, 5, 23, 8, 44, 59, 155, DateTimeKind.Local).AddTicks(3142),
+                            CreatedAt = new DateTime(2025, 5, 22, 12, 51, 3, 279, DateTimeKind.Local).AddTicks(4357),
                             NameCategory = "C11",
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
@@ -134,7 +137,7 @@ namespace MVCTemplate.DataAccess.Migrations
                         {
                             IdCategory = 2,
                             CodeCategory = "22C",
-                            CreatedAt = new DateTime(2025, 5, 23, 8, 44, 59, 155, DateTimeKind.Local).AddTicks(3152),
+                            CreatedAt = new DateTime(2025, 5, 22, 12, 51, 3, 279, DateTimeKind.Local).AddTicks(4371),
                             NameCategory = "C22",
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
@@ -142,40 +145,10 @@ namespace MVCTemplate.DataAccess.Migrations
                         {
                             IdCategory = 3,
                             CodeCategory = "33C",
-                            CreatedAt = new DateTime(2025, 5, 23, 8, 44, 59, 155, DateTimeKind.Local).AddTicks(3153),
+                            CreatedAt = new DateTime(2025, 5, 22, 12, 51, 3, 279, DateTimeKind.Local).AddTicks(4372),
                             NameCategory = "C23",
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
-                });
-
-            modelBuilder.Entity("MVCTemplate.Models.Package", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Priority")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Packages");
                 });
 
             modelBuilder.Entity("MVCTemplate.Models.Person", b =>
@@ -214,7 +187,7 @@ namespace MVCTemplate.DataAccess.Migrations
                         {
                             Id = 1,
                             CategoryId = 1,
-                            CreatedAt = new DateTime(2025, 5, 23, 8, 44, 59, 155, DateTimeKind.Local).AddTicks(3338),
+                            CreatedAt = new DateTime(2025, 5, 22, 12, 51, 3, 279, DateTimeKind.Local).AddTicks(4500),
                             Name = "Name1",
                             Position = "E1",
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -223,7 +196,7 @@ namespace MVCTemplate.DataAccess.Migrations
                         {
                             Id = 2,
                             CategoryId = 1,
-                            CreatedAt = new DateTime(2025, 5, 23, 8, 44, 59, 155, DateTimeKind.Local).AddTicks(3340),
+                            CreatedAt = new DateTime(2025, 5, 22, 12, 51, 3, 279, DateTimeKind.Local).AddTicks(4502),
                             Name = "Name2",
                             Position = "E2",
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -232,7 +205,7 @@ namespace MVCTemplate.DataAccess.Migrations
                         {
                             Id = 3,
                             CategoryId = 1,
-                            CreatedAt = new DateTime(2025, 5, 23, 8, 44, 59, 155, DateTimeKind.Local).AddTicks(3341),
+                            CreatedAt = new DateTime(2025, 5, 22, 12, 51, 3, 279, DateTimeKind.Local).AddTicks(4503),
                             Name = "Name3",
                             Position = "E3",
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
