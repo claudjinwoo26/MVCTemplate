@@ -46,7 +46,7 @@ namespace MVCTemplate.Areas.Admin.Controllers
 
             if (file != null && file.Length > 0)
             {
-                var uploadsFolder = $"{Directory.GetCurrentDirectory()}\\wwwroot\\Uploads\\"; // has to be on the root folder
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Uploads");
 
                 if (!Directory.Exists(uploadsFolder))
                 {
@@ -62,18 +62,12 @@ namespace MVCTemplate.Areas.Admin.Controllers
 
                 using (var stream = System.IO.File.Open(filePath, FileMode.Open, FileAccess.Read))
                 {
-                    // Auto-detect format, supports:
-                    //  - Binary Excel files (2.0-2003 format; *.xls)
-                    //  - OpenXml Excel files (2007 format; *.xlsx, *.xlsb)
                     using (var reader = ExcelReaderFactory.CreateReader(stream))
                     {
-                        // Choose one of either 1 or 2:
-
-                        // 1. Use the reader methods
+                        bool dataInserted = false;
                         do
                         {
                             bool isHeaderSkipped = false;
-
                             while (reader.Read())
                             {
                                 if (!isHeaderSkipped)
@@ -81,37 +75,54 @@ namespace MVCTemplate.Areas.Admin.Controllers
                                     isHeaderSkipped = true;
                                     continue;
                                 }
-                                Package p = new Package();
-                                p.Name = reader.GetValue(1).ToString(); // skips the ID column
-                                p.Description = reader.GetValue(2).ToString();
-                                p.Priority = Convert.ToInt32(reader.GetValue(3).ToString());
+
+                                var name = reader.GetValue(1)?.ToString();
+                                var description = reader.GetValue(2)?.ToString();
+                                var priorityValue = reader.GetValue(3)?.ToString();
+
+                                if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(priorityValue))
+                                {
+                                    TempData["Warning"] = "Some rows had missing data and were skipped.";
+                                    continue;
+                                }
+
+                                Package p = new Package
+                                {
+                                    Name = name,
+                                    Description = description,
+                                    Priority = Convert.ToInt32(priorityValue)
+                                };
 
                                 _context.Add(p);
                                 await _context.SaveChangesAsync();
-                                // does not check for unique name
+                                dataInserted = true;
                             }
                         } while (reader.NextResult());
 
-                        ViewBag.Message = "success";
+                        if (dataInserted)
+                            TempData["Success"] = "Excel data uploaded successfully.";
+                        else
+                            TempData["Warning"] = "No valid data found in the file.";
                     }
                 }
             }
-            else ViewBag.Message = "empty";
+            else
+            {
+                TempData["Warning"] = "Please upload a valid Excel file.";
+            }
+
             return View();
-
-            // below is for product
-
         }
+
 
         [HttpPost]
         public async Task<IActionResult> UploadExcelProduct(IFormFile file)
         {
-           
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
             if (file != null && file.Length > 0)
             {
-                var uploadsFolder = $"{Directory.GetCurrentDirectory()}\\wwwroot\\Uploads\\"; // has to be on the root folder
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Uploads");
 
                 if (!Directory.Exists(uploadsFolder))
                 {
@@ -127,14 +138,11 @@ namespace MVCTemplate.Areas.Admin.Controllers
 
                 using (var stream = System.IO.File.Open(filePath, FileMode.Open, FileAccess.Read))
                 {
-                    // Auto-detect format, supports:
-                    //  - Binary Excel files (2.0-2003 format; *.xls)
-                    //  - OpenXml Excel files (2007 format; *.xlsx, *.xlsb)
                     using (var reader = ExcelReaderFactory.CreateReader(stream))
                     {
-                        // Choose one of either 1 or 2:
+                        bool dataInserted = false;
+                        bool invalidRowFound = false;
 
-                        // 1. Use the reader methods
                         do
                         {
                             bool isHeaderSkipped = false;
@@ -146,28 +154,54 @@ namespace MVCTemplate.Areas.Admin.Controllers
                                     isHeaderSkipped = true;
                                     continue;
                                 }
+
+                                var name = reader.GetValue(1)?.ToString();
+                                var description = reader.GetValue(2)?.ToString();
+                                var quantityStr = reader.GetValue(3)?.ToString();
+
+                                if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(quantityStr) || !int.TryParse(quantityStr, out int quantity))
+                                {
+                                    invalidRowFound = true;
+                                    continue;
+                                }
+
                                 Product pr = new Product
                                 {
-                                    Name = reader.GetValue(1).ToString(), // skips the ID column
-                                    Description = reader.GetValue(2).ToString(),
-                                    Quantity = Convert.ToInt32(reader.GetValue(3).ToString())
+                                    Name = name,
+                                    Description = description,
+                                    Quantity = quantity
                                 };
 
                                 _context.Add(pr);
                                 await _context.SaveChangesAsync();
-                                // does not check for unique name
+                                dataInserted = true;
                             }
                         } while (reader.NextResult());
 
-                        //ViewBag.Message = "success";
+                        if (dataInserted)
+                        {
+                            TempData["Success"] = "Product Excel data uploaded successfully.";
+                        }
+
+                        if (invalidRowFound)
+                        {
+                            TempData["Warning"] = "Some rows had missing or invalid data and were skipped.";
+                        }
+
+                        if (!dataInserted && !invalidRowFound)
+                        {
+                            TempData["Warning"] = "No valid data found in the uploaded file.";
+                        }
                     }
                 }
             }
-            else return BadRequest("Something went wrong!");
+            else
+            {
+                TempData["Warning"] = "Please upload a valid Excel file.";
+            }
 
             return View("UploadExcel");
-            //for product
-
         }
+
     }
 }
