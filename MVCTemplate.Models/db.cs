@@ -20,6 +20,7 @@ namespace MVCTemplate.Models
             da.Fill(dt);
             return dt;
         }
-
+        //tutorial https://www.youtube.com/watch?v=yW4Yp_J_m6k
+        //because of the nature of the query its usability is lower
     }
 }

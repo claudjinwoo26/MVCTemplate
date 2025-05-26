@@ -48,7 +48,7 @@ namespace MVCTemplate.Areas.Admin.Controllers
                 document.Save(streamOut);
                 return File(streamOut.ToArray(), "application/pdf", "Packages.pdf");
             }
-        }
+        } //used db.cs and query from server explorer
 
         public IActionResult Index()
         {
