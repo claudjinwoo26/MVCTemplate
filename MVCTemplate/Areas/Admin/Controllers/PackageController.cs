@@ -14,6 +14,7 @@ using Aspose.Pdf;
 using Aspose.Pdf.Text;
 using System.Data;
 using System.IO;
+//using System.IO.Packaging;
 
 namespace MVCTemplate.Areas.Admin.Controllers
 {
@@ -23,6 +24,27 @@ namespace MVCTemplate.Areas.Admin.Controllers
     public class PackageController : Controller
     {
         db dbop = new db();
+        private readonly ApplicationDbContext _context;
+
+        public IActionResult ShowPackagesData()
+        {
+            return View();
+        } // for charts
+
+        [HttpPost]
+        public List<object> GetPackagesData()
+        {
+            List<object> data = new List<object>();
+
+            List<string> labels = _context.Packages.Select(p => p.Name).ToList();
+
+            data.Add(labels);
+
+            List<int> Priority = _context.Packages.Select(p => p.Priority).ToList();
+            data.Add(Priority);
+
+            return data;
+        }
 
         public IActionResult PDF() 
         {
@@ -57,9 +79,10 @@ namespace MVCTemplate.Areas.Admin.Controllers
 
         private IUnitOfWork _unitOfWork;
 
-        public PackageController(IUnitOfWork unitOfWork)
+        public PackageController(IUnitOfWork unitOfWork, ApplicationDbContext context)
         {
             _unitOfWork = unitOfWork;
+            _context = context; //avoid double constructors
         }
 
         public IActionResult Import()
