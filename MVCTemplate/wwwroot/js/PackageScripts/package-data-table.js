@@ -1,5 +1,5 @@
 ﻿$(document).ready(function () {
-    const table = $('#packageTable').DataTable({
+    const dataTable = $('#packageTable').DataTable({
         "ajax": { url: '/Admin/Package/GetAllPackages' },
         "columns": [
             { data: 'name', "autowidth": true },
@@ -26,12 +26,12 @@
 
     // Filter by Name column
     $('#nameSearch').on('keyup change', function () {
-        table.column(0).search(this.value).draw(); // 0 is the index for the "Name" column
+        dataTable.column(0).search(this.value).draw(); // 0 is the index for the "Name" column
     });
 
     // Filter by Description column
     $('#descriptionSearch').on('keyup change', function () {
-        table.column(1).search(this.value).draw();
+        dataTable.column(1).search(this.value).draw();
     });
 
     $('#prioritySearch').on('keyup change', function () {
@@ -40,11 +40,11 @@
 
         if (val === '' || (/^[1-5]$/).test(val)) {
             // Valid input
-            table.column(2).search(val).draw();
+            dataTable.column(2).search(val).draw();
             $error.text('').hide();
         } else {
             // Invalid input
-            table.column(2).search('').draw();
+            dataTable.column(2).search('').draw();
             $error.text('Please enter a number between 1 and 5.').show();
         }
     });
