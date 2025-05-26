@@ -16,7 +16,7 @@
             </div>
             <div class="page-title-actions">
                 <div class="d-inline-block dropdown">
-                    
+
                     <form method="get" action="/Admin/Package/PDF">
                         <button type="submit">Download PDF</button>
                     </form>
@@ -24,9 +24,8 @@
                     <button type="button" class="btn-shadow btn btn-primary" data-bs-toggle="modal" data-bs-target="#importModal">
                         <i class="fa-regular fa-file-excel" style="color: #ffffff;"></i>
                         Import
-
                     </button>
-                    
+
                     <button id="button-excel" class="btn btn-success">
                         <i class="fa-regular fa-file-excel" style="color: #ffffff;"></i>
                         Export
@@ -39,8 +38,27 @@
             </div>
         </div>
     </div>
+
     <div class="main-card mb-3 card">
         <div class="card-body">
+
+            <!-- Search Filters -->
+            <div class="mb-3 row">
+                <div class="col-md-4">
+                    <label for="nameSearch" class="form-label">Search by Name:</label>
+                    <input type="text" id="nameSearch" class="form-control" placeholder="Package name..." />
+                </div>
+                <div class="col-md-4">
+                    <label for="descriptionSearch" class="form-label">Search by Description:</label>
+                    <input type="text" id="descriptionSearch" class="form-control" placeholder="Package description..." />
+                </div>
+                <div class="col-md-4">
+                    <label for="prioritySearch" class="form-label">Search by Priority (1-5):</label>
+                    <input type="text" id="prioritySearch" class="form-control" placeholder="Enter priority number..." />
+                    <small id="prioritySearchError" class="text-danger" style="display: none;"></small>
+                </div>
+            </div>
+
             <div class="table-responsive">
                 <table style="width: 100%;" id="packageTable" class="table table-hover table-striped table-bordered display nowrap">
                     <thead>
@@ -48,6 +66,8 @@
                             <th>Name</th>
                             <th>Description</th>
                             <th>Priority</th>
+                            <th>Date Created</th>
+                            <th>Date Updated</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -55,13 +75,14 @@
                     </tbody>
                 </table>
             </div>
+
         </div>
     </div>
 </div>
+
 @section Modal
 {
-
-    @* Create Modal*@
+    <!-- Create Modal -->
     <div class="modal fade" id="createModal" tabindex="-1" role="dialog"
          aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -85,7 +106,13 @@
                         </div>
                         <div class="form-group">
                             <label asp-for="Priority" class="control-label">Priority<span class="text-danger">*</span></label>
-                            <input asp-for="Priority" class="form-control" />
+                            <select asp-for="Priority" class="form-control">
+                                <option value="">-- Select Priority --</option>
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <option value="@i">@i</option>
+                                }
+                            </select>
                             <span asp-validation-for="Priority" class="text-danger"></span>
                         </div>
                         <div class="modal-footer">
@@ -101,7 +128,7 @@
         </div>
     </div>
 
-    @* Import Modal*@
+    <!-- Import Modal -->
     <div class="modal fade" id="importModal" tabindex="-1" role="dialog"
          aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -116,8 +143,7 @@
                         <div class="form-group">
                             <label for="file" class="control-label">File <span class="text-danger">*</span></label>
                             <input type="file" name="file" class="form-control" />
-                        </div>                  @*^ it is also named file in the controller function*@
-
+                        </div>
                         <div class="modal-footer">
                             <button type="button" class="btn-shadow btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button id="importFileSubmitBtn" class="ladda-button  me-2 btn-shadow btn btn-primary" data-style="expand-left">
@@ -131,8 +157,7 @@
         </div>
     </div>
 
-
-    @* Update Modal *@
+    <!-- Update Modal -->
     <div class="modal fade" id="updateModal" tabindex="-1" role="dialog"
          aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -157,7 +182,13 @@
                         </div>
                         <div class="form-group">
                             <label asp-for="Priority" class="control-label">Priority<span class="text-danger">*</span></label>
-                            <input asp-for="Priority" class="form-control" id="priority" />
+                            <select asp-for="Priority" class="form-control" id="priority">
+                                <option value="">-- Select Priority --</option>
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <option value="@i">@i</option>
+                                }
+                            </select>
                             <span asp-validation-for="Priority" class="text-danger"></span>
                         </div>
                     </div>
@@ -181,5 +212,4 @@
     <partial name="_ValidationScriptsPartial" />
     <script src="~/js/deleteGeneralSettings.js"></script>
     <script src="~/js/PackageScripts/package-export.js"></script>
-
 }
