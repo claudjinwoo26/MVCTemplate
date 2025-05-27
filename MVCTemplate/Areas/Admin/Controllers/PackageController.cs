@@ -36,12 +36,23 @@ namespace MVCTemplate.Areas.Admin.Controllers
         {
             List<object> data = new List<object>();
 
-            List<string> labels = _context.Packages.Select(p => p.Name).ToList();
+            // Group by priority and count how many packages have each priority
+            var priorityCounts = _context.Packages
+                .GroupBy(p => p.Priority)
+                .Select(g => new {
+                    Priority = g.Key,
+                    Count = g.Count()
+                })
+                .OrderBy(x => x.Priority) // Optional: sort by priority
+                .ToList();
 
+            // X-axis labels: Priority values (e.g., 1, 2, 3)
+            List<string> labels = priorityCounts.Select(p => p.Priority.ToString()).ToList();
             data.Add(labels);
 
-            List<int> Priority = _context.Packages.Select(p => p.Priority).ToList();
-            data.Add(Priority);
+            // Y-axis values: number of records with that priority
+            List<int> counts = priorityCounts.Select(p => p.Count).ToList();
+            data.Add(counts);
 
             return data;
         }

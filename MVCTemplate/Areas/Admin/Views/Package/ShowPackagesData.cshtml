@@ -4,7 +4,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="row">
+<div class="row mb-3">
     <div class="col-1">
         <label><b>Chart-Type</b></label>
     </div>
@@ -21,7 +21,6 @@
         <input id="ShowGraphBtn" value="Show Graph" type="button" class="btn btn-primary" />
     </div>
 </div>
-<br />
 
 <div id="ChartView">
     <canvas id="myChart" style="max-width:750px; max-height:400px;"></canvas>
@@ -39,7 +38,7 @@
                 return;
             }
 
-            // Clear and re-add the canvas
+            // Clear and recreate canvas
             $("#ChartView").html('<canvas id="myChart" style="max-width:750px; max-height:400px;"></canvas>');
 
             $.ajax({
@@ -52,19 +51,47 @@
             });
 
             function OnSuccessResult(data) {
-                var _chartLabels = data[0];
-                var _chartData = data[1];
+                var _chartLabels = data[0]; // Priorities
+                var _chartData = data[1];   // Counts
 
-                var barColors = ["red", "green", "blue", "orange", "brown", "purple"];
+                var barColors = ["red", "green", "blue", "orange", "purple", "cyan", "magenta", "brown"];
 
                 new Chart(document.getElementById("myChart"), {
                     type: chartType,
                     data: {
                         labels: _chartLabels,
                         datasets: [{
+                            label: 'Number of Packages',
                             backgroundColor: barColors,
                             data: _chartData
                         }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Packages Grouped by Priority'
+                            },
+                            legend: {
+                                display: chartType === 'pie' || chartType === 'doughnut'
+                            }
+                        },
+                        scales: (chartType === 'bar' || chartType === 'line') ? {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Priority'
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Count of Packages'
+                                }
+                            }
+                        } : {}
                     }
                 });
             }
