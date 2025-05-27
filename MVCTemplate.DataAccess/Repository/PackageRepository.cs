@@ -37,12 +37,19 @@ namespace MVCTemplate.DataAccess.Repository
 
         public void Update(Package package)
         {
-            var existing = _db.Packages.AsNoTracking().FirstOrDefault(p => p.Id == package.Id);
+            var entry = _db.Packages.Attach(package);
+            entry.Property(p => p.Name).IsModified = true;
+            entry.Property(p => p.Description).IsModified = true;
+            entry.Property(p => p.Priority).IsModified = true;
+            entry.Property(p => p.UpdatedAt).IsModified = true;
+
+            // Do not modify CreatedAt
+            /*var existing = _db.Packages.AsNoTracking().FirstOrDefault(p => p.Id == package.Id);
             if (existing != null)
             {
                 package.CreatedAt = existing.CreatedAt;
                 _db.Packages.Update(package);
-            } // to avoid createdAt being overwritten
+            }*/ // to avoid createdAt being overwritten but makes the createdAt inaccessible in the sql server directly
         }
     }
 }
