@@ -268,6 +268,40 @@ namespace MVCTemplate.Areas.Admin.Controllers
             }
         }
 
+        [HttpGet]
+        public IActionResult ExportToExcel()
+        {
+            ExcelPackage.License.SetNonCommercialPersonal("My Name"); //for the epplus
+
+            var packages = _unitOfWork.Package.GetAll().ToList();
+
+            using var package = new ExcelPackage();
+            var worksheet = package.Workbook.Worksheets.Add("Packages");
+
+            // Add headers
+            worksheet.Cells[1, 1].Value = "Name";
+            worksheet.Cells[1, 2].Value = "Description";
+            worksheet.Cells[1, 3].Value = "Priority";
+
+            // Fill data
+            for (int i = 0; i < packages.Count; i++)
+            {
+                var row = i + 2; // Data starts from row 2
+                worksheet.Cells[row, 1].Value = packages[i].Name;
+                worksheet.Cells[row, 2].Value = packages[i].Description;
+                worksheet.Cells[row, 3].Value = packages[i].Priority;
+            }
+
+            // Add filter to the header row
+            worksheet.Cells[1, 1, 1, 3].AutoFilter = true;
+
+            // Auto fit columns
+            worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
+            var stream = new MemoryStream(package.GetAsByteArray());
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Packages.xlsx");
+        }
+
 
         #region API Calls
         [HttpGet]
