@@ -37,7 +37,12 @@ namespace MVCTemplate.DataAccess.Repository
 
         public void Update(Package package)
         {
-            _db.Packages.Update(package);
+            var existing = _db.Packages.AsNoTracking().FirstOrDefault(p => p.Id == package.Id);
+            if (existing != null)
+            {
+                package.CreatedAt = existing.CreatedAt;
+                _db.Packages.Update(package);
+            } // to avoid createdAt being overwritten
         }
     }
 }
