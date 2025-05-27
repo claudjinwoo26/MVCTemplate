@@ -46,6 +46,7 @@
         </div>
         <div class="col-4">
             <input id="ShowGraphBtn" value="Show Graph" type="button" class="btn btn-primary" />
+            <input id="RemoveGraphBtn" value="Remove Graph" type="button" class="btn btn-danger ms-2" />
         </div>
     </div>
 
@@ -77,8 +78,7 @@
 
 @section Modal {
     <!-- Create Modal -->
-    <div class="modal fade" id="createModal" tabindex="-1" role="dialog"
-         aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -105,7 +105,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn-shadow btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button id="createAddFormSubmitBtn" class="ladda-button  me-2 btn-shadow btn btn-primary" data-style="expand-left">
+                        <button id="createAddFormSubmitBtn" class="ladda-button me-2 btn-shadow btn btn-primary" data-style="expand-left">
                             <span class="ladda-label">Save Changes</span>
                             <span class="ladda-spinner"></span>
                         </button>
@@ -116,8 +116,7 @@
     </div>
 
     <!-- Update Modal -->
-    <div class="modal fade" id="updateModal" tabindex="-1" role="dialog"
-         aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -145,7 +144,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn-shadow btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button id="createEditFormSubmitBtn" class="ladda-button  me-2 btn-shadow btn btn-primary" data-style="expand-left">
+                        <button id="createEditFormSubmitBtn" class="ladda-button me-2 btn-shadow btn btn-primary" data-style="expand-left">
                             <span class="ladda-label">Save Changes</span>
                             <span class="ladda-spinner"></span>
                         </button>
@@ -181,8 +180,8 @@
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     success: function (data) {
-                        var _chartLabels = data[0]; // Product Names
-                        var _chartData = data[1];   // Quantities
+                        var _chartLabels = data[0];
+                        var _chartData = data[1];
 
                         var barColors = ["#007bff", "#28a745", "#dc3545", "#ffc107", "#17a2b8", "#6c757d", "#fd7e14", "#20c997"];
 
@@ -229,6 +228,11 @@
                         console.error("Error fetching chart data:", error);
                     }
                 });
+            });
+
+            // Remove the chart when clicked
+            $("#RemoveGraphBtn").click(function () {
+                $("#ChartView").html("");
             });
         });
     </script>
