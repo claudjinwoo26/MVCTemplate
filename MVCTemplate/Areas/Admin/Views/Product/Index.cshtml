@@ -1,7 +1,9 @@
 ﻿@model Product
 @{
     ViewData["Title"] = "Product";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
 <div class="app-main__inner">
     <div class="app-page-title">
         <div class="page-title-wrapper">
@@ -27,6 +29,32 @@
             </div>
         </div>
     </div>
+
+    <!-- Chart Controls -->
+    <div class="row mb-3">
+        <div class="col-1">
+            <label><b>Chart-Type</b></label>
+        </div>
+        <div class="col-2">
+            <select id="ChartType" class="form-control" style="width:150px;">
+                <option selected>--Select Chart Type--</option>
+                <option value="bar">Bar</option>
+                <option value="line">Line</option>
+                <option value="pie">Pie</option>
+                <option value="doughnut">Doughnut</option>
+            </select>
+        </div>
+        <div class="col-4">
+            <input id="ShowGraphBtn" value="Show Graph" type="button" class="btn btn-primary" />
+        </div>
+    </div>
+
+    <!-- Chart Container -->
+    <div id="ChartView">
+        <canvas id="myChart" style="max-width:750px; max-height:400px;"></canvas>
+    </div>
+
+    <!-- Product Table -->
     <div class="main-card mb-3 card">
         <div class="card-body">
             <div class="table-responsive">
@@ -47,29 +75,26 @@
     </div>
 </div>
 
-@section Modal
-{
-
-    @* Create Modal*@
+@section Modal {
+    <!-- Create Modal -->
     <div class="modal fade" id="createModal" tabindex="-1" role="dialog"
          aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Add Product</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form asp-action="Create" asp-controller="Product" method="post" id="createForm">
                     <div class="modal-body">
                         <div class="form-group">
                             <label asp-for="Name" class="control-label">Product Name<span class="text-danger">*</span></label>
-                            <input asp-for="Name" class="form-control"/>
+                            <input asp-for="Name" class="form-control" />
                             <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
                         <div class="form-group">
                             <label asp-for="Description" class="control-label">Product Description</label>
-                            <input asp-for="Description" class="form-control"/>
+                            <input asp-for="Description" class="form-control" />
                             <span asp-validation-for="Description" class="text-danger"></span>
                         </div>
                         <div class="form-group">
@@ -90,32 +115,31 @@
         </div>
     </div>
 
-    @* Update Modal *@
+    <!-- Update Modal -->
     <div class="modal fade" id="updateModal" tabindex="-1" role="dialog"
          aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <div class="modal-header"> 
+                <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Update Product</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form asp-action="Update" asp-controller="Product" method="put" id="updateForm">
                     <div class="modal-body">
-                        <input type="hidden" asp-for="Id" id="productId" /> @*id must be same with data-table and asp-for must be same for Model*@
+                        <input type="hidden" asp-for="Id" id="productId" />
                         <div class="form-group">
                             <label asp-for="Name" class="control-label">Product Name:<span class="text-danger">*</span></label>
-                            <input asp-for="Name" class="form-control" id="name" /> @*same here*@
+                            <input asp-for="Name" class="form-control" id="name" />
                             <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
                         <div class="form-group">
                             <label asp-for="Description" class="control-label">Product Description</label>
-                            <input asp-for="Description" class="form-control" id="description" /> @*same here*@
-                            <span asp-validation-for="Description" class="text-danger"></span> 
+                            <input asp-for="Description" class="form-control" id="description" />
+                            <span asp-validation-for="Description" class="text-danger"></span>
                         </div>
                         <div class="form-group">
                             <label asp-for="Quantity" class="control-label">Product Quantity<span class="text-danger">*</span></label>
-                            <input asp-for="Quantity" type="number" class="form-control" id="quantity" /> @*same here*@
+                            <input asp-for="Quantity" type="number" class="form-control" id="quantity" />
                             <span asp-validation-for="Quantity" class="text-danger"></span>
                         </div>
                     </div>
@@ -130,15 +154,82 @@
             </div>
         </div>
     </div>
-
-
 }
+
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="~/js/validation.js"></script>
     <script src="~/js/formSubmissionAjax.js"></script>
     <script src="~/js/ProductScripts/product-data-table.js"></script>
-    <partial name="_ValidationScriptsPartial" />
     <script src="~/js/deleteGeneralSettings.js"></script>
     <script src="~/js/ProductScripts/product-export.js"></script>
-    
+
+    <script>
+        $(function () {
+            $("#ShowGraphBtn").click(function () {
+                var chartType = $("#ChartType").val();
+                if (chartType === "--Select Chart Type--") {
+                    alert("Please select a chart type.");
+                    return;
+                }
+
+                $("#ChartView").html('<canvas id="myChart" style="max-width:750px; max-height:400px;"></canvas>');
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Admin/Product/GetProductsData",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        var _chartLabels = data[0]; // Product Names
+                        var _chartData = data[1];   // Quantities
+
+                        var barColors = ["#007bff", "#28a745", "#dc3545", "#ffc107", "#17a2b8", "#6c757d", "#fd7e14", "#20c997"];
+
+                        new Chart(document.getElementById("myChart"), {
+                            type: chartType,
+                            data: {
+                                labels: _chartLabels,
+                                datasets: [{
+                                    label: 'Product Quantities',
+                                    backgroundColor: barColors,
+                                    data: _chartData
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: {
+                                    title: {
+                                        display: true,
+                                        text: 'Product Quantities by Name'
+                                    },
+                                    legend: {
+                                        display: chartType === 'pie' || chartType === 'doughnut'
+                                    }
+                                },
+                                scales: (chartType === 'bar' || chartType === 'line') ? {
+                                    x: {
+                                        title: {
+                                            display: true,
+                                            text: 'Product Name'
+                                        }
+                                    },
+                                    y: {
+                                        beginAtZero: true,
+                                        title: {
+                                            display: true,
+                                            text: 'Quantity'
+                                        }
+                                    }
+                                } : {}
+                            }
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error fetching chart data:", error);
+                    }
+                });
+            });
+        });
+    </script>
 }
