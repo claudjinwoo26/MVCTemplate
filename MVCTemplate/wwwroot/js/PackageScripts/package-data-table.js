@@ -54,6 +54,40 @@ function loadDataTable() {
         }
     });
 
+// Date range filter using DataTables custom filter extension
+$.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+    let min = $('#startDate').val();
+    let max = $('#endDate').val();
+    let dateStr = data[3]; // "createdAt" is column index 3
+
+    if (!dateStr) return false;
+
+    let createdDate = new Date(dateStr);
+    createdDate.setHours(0, 0, 0, 0); // Normalize time to 00:00 for consistency
+
+    let minDate = min ? new Date(min) : null;
+    let maxDate = max ? new Date(max) : null;
+
+    if (minDate) minDate.setHours(0, 0, 0, 0);
+    if (maxDate) maxDate.setHours(23, 59, 59, 999); // Include full end date
+
+    if (
+        (!minDate || createdDate >= minDate) &&
+        (!maxDate || createdDate <= maxDate)
+    ) {
+        return true;
+    }
+
+    return false;
+});
+
+
+// Redraw table on date input change
+$('#startDate, #endDate').on('change', function () {
+    dataTable.draw();
+});
+
+
 // Populate update modal with selected row data
 $('#updateModal').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget);
