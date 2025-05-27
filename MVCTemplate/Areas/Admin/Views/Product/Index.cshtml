@@ -32,11 +32,9 @@
 
     <!-- Chart Controls -->
     <div class="row mb-3">
-        <div class="col-1">
-            <label><b>Chart-Type</b></label>
-        </div>
         <div class="col-2">
-            <select id="ChartType" class="form-control" style="width:150px;">
+            <label><b>Chart-Type</b></label>
+            <select id="ChartType" class="form-control">
                 <option selected>--Select Chart Type--</option>
                 <option value="bar">Bar</option>
                 <option value="line">Line</option>
@@ -44,14 +42,14 @@
                 <option value="doughnut">Doughnut</option>
             </select>
         </div>
-        <div class="col-4">
-            <input id="ShowGraphBtn" value="Show Graph" type="button" class="btn btn-primary" />
-            <input id="RemoveGraphBtn" value="Remove Graph" type="button" class="btn btn-danger ms-2" />
+        <div class="col-auto align-self-end">
+            <button id="ShowGraphBtn" class="btn btn-primary">Show Graph</button>
+            <button id="RemoveGraphBtn" class="btn btn-danger">Remove Graph</button>
         </div>
     </div>
 
-    <!-- Chart Container -->
-    <div id="ChartView">
+    <!-- Chart Container (hidden by default) -->
+    <div id="ChartView" style="display: none;">
         <canvas id="myChart" style="max-width:750px; max-height:400px;"></canvas>
     </div>
 
@@ -68,8 +66,7 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
-                    </tbody>
+                    <tbody></tbody>
                 </table>
             </div>
         </div>
@@ -82,72 +79,30 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Add Product</h5>
+                    <h5 class="modal-title">Add Product</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form asp-action="Create" asp-controller="Product" method="post" id="createForm">
                     <div class="modal-body">
                         <div class="form-group">
-                            <label asp-for="Name" class="control-label">Product Name<span class="text-danger">*</span></label>
+                            <label asp-for="Name">Product Name<span class="text-danger">*</span></label>
                             <input asp-for="Name" class="form-control" />
                             <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
                         <div class="form-group">
-                            <label asp-for="Description" class="control-label">Product Description</label>
+                            <label asp-for="Description">Product Description</label>
                             <input asp-for="Description" class="form-control" />
                             <span asp-validation-for="Description" class="text-danger"></span>
                         </div>
                         <div class="form-group">
-                            <label asp-for="Quantity" class="control-label">Product Quantity<span class="text-danger">*</span></label>
+                            <label asp-for="Quantity">Product Quantity<span class="text-danger">*</span></label>
                             <input asp-for="Quantity" type="number" class="form-control" />
                             <span asp-validation-for="Quantity" class="text-danger"></span>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn-shadow btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button id="createAddFormSubmitBtn" class="ladda-button me-2 btn-shadow btn btn-primary" data-style="expand-left">
-                            <span class="ladda-label">Save Changes</span>
-                            <span class="ladda-spinner"></span>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Update Modal -->
-    <div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Update Product</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form asp-action="Update" asp-controller="Product" method="put" id="updateForm">
-                    <div class="modal-body">
-                        <input type="hidden" asp-for="Id" id="productId" />
-                        <div class="form-group">
-                            <label asp-for="Name" class="control-label">Product Name:<span class="text-danger">*</span></label>
-                            <input asp-for="Name" class="form-control" id="name" />
-                            <span asp-validation-for="Name" class="text-danger"></span>
-                        </div>
-                        <div class="form-group">
-                            <label asp-for="Description" class="control-label">Product Description</label>
-                            <input asp-for="Description" class="form-control" id="description" />
-                            <span asp-validation-for="Description" class="text-danger"></span>
-                        </div>
-                        <div class="form-group">
-                            <label asp-for="Quantity" class="control-label">Product Quantity<span class="text-danger">*</span></label>
-                            <input asp-for="Quantity" type="number" class="form-control" id="quantity" />
-                            <span asp-validation-for="Quantity" class="text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn-shadow btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button id="createEditFormSubmitBtn" class="ladda-button me-2 btn-shadow btn btn-primary" data-style="expand-left">
-                            <span class="ladda-label">Save Changes</span>
-                            <span class="ladda-spinner"></span>
-                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button id="createAddFormSubmitBtn" class="btn btn-primary">Save Changes</button>
                     </div>
                 </form>
             </div>
@@ -172,7 +127,7 @@
                     return;
                 }
 
-                $("#ChartView").html('<canvas id="myChart" style="max-width:750px; max-height:400px;"></canvas>');
+                $("#ChartView").show().html('<canvas id="myChart" style="max-width:750px; max-height:400px;"></canvas>');
 
                 $.ajax({
                     type: "POST",
@@ -230,9 +185,8 @@
                 });
             });
 
-            // Remove the chart when clicked
             $("#RemoveGraphBtn").click(function () {
-                $("#ChartView").html("");
+                $("#ChartView").hide().html('');
             });
         });
     </script>
