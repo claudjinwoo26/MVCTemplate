@@ -10,8 +10,34 @@ function loadDataTable() {
             { data: 'name', "autowidth": true },
             { data: 'description', "autowidth": true },
             { data: 'priority', "autowidth": true },
-            { data: 'createdAt', "autowidth": true },
-            { data: 'updatedAt', "autowidth": true },
+            {
+                data: 'createdAt',
+                "render": function (data) {
+                    return new Date(data).toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true
+                    });
+                },
+                "autowidth": true
+            },
+            {
+                data: 'updatedAt',
+                "render": function (data) {
+                    return new Date(data).toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true
+                    });
+                },
+                "autowidth": true
+            },
             {
                 data: 'id',
                 "render": function (data, type, full, meta) {
