@@ -1,5 +1,10 @@
 ﻿$(document).ready(function () {
-    const dataTable = $('#packageTable').DataTable({
+    loadDataTable();
+});
+
+
+function loadDataTable() {
+    dataTable = $('#packageTable').DataTable({
         "ajax": { url: '/Admin/Package/GetAllPackages' },
         "columns": [
             { data: 'name', "autowidth": true },
@@ -23,7 +28,7 @@
             }
         ]
     });
-
+};
     // Filter by Name column
     $('#nameSearch').on('keyup change', function () {
         dataTable.column(0).search(this.value).draw(); // 0 is the index for the "Name" column
@@ -48,9 +53,6 @@
             $error.text('Please enter a number between 1 and 5.').show();
         }
     });
-
-
-});
 
 // Populate update modal with selected row data
 $('#updateModal').on('show.bs.modal', function (event) {
