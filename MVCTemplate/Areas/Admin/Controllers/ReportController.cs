@@ -90,10 +90,19 @@ namespace MVCTemplate.Controllers
             return BadRequest(new { success = false, message = "Validation failed", errors });
         }
 
-        // POST: /Report/Update
+        // POST: /Report/Update             // AGGRESSIVE WAY TO ALLOW imageFile to be empty
         [HttpPost]
         public async Task<IActionResult> Update(ReportVM model)
         {
+            // Remove all validation errors related to ImageFile so image is optional during update
+            if (ModelState.ContainsKey(nameof(model.ImageFile)))
+            {
+                ModelState[nameof(model.ImageFile)].Errors.Clear();
+
+                // Also mark the field as valid in ModelState dictionary
+                ModelState[nameof(model.ImageFile)].ValidationState = Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Valid;
+            }
+
             if (ModelState.IsValid)
             {
                 var report = await _context.Reports.FindAsync(model.Id);
@@ -138,9 +147,16 @@ namespace MVCTemplate.Controllers
                 return Json(new { success = true, message = "Report updated successfully." });
             }
 
-            var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+            // If invalid, return all validation errors for debugging
+            var errors = ModelState
+                .Where(kvp => kvp.Value.Errors.Count > 0)
+                .Select(kvp => new { Field = kvp.Key, Errors = kvp.Value.Errors.Select(e => e.ErrorMessage).ToList() })
+                .ToList();
+
             return BadRequest(new { success = false, message = "Validation failed", errors });
         }
+
+
 
         // DELETE: /Report/Delete/{id}
         [HttpDelete]
