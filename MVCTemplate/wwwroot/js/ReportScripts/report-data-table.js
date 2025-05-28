@@ -39,7 +39,7 @@ function loadDataTableReport() {
                                     data-bs-target="#updateModal">
                                 <i class="lnr-pencil"></i> Edit
                             </button>
-                            <a href="javascript:void(0);" onClick="DeleteReport('/Admin/Report/Delete/${data}')" class="btn-shadow btn btn-danger mx-3">
+                            <a href="javascript:void(0);" onClick="Delete('/Admin/Report/Delete/${data}')" class="btn-shadow btn btn-danger mx-3">
                                 <i class="lnr-trash"></i> Delete
                             </a>
                         </div>`;
@@ -71,28 +71,3 @@ $('#updateModal').on('show.bs.modal', function (event) {
     modal.find('#updateImageName').val(imageName);
     modal.find('#updateDescription').val(description);
 });
-
-async function Delete(url) {
-    const result = await Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
-    });
-
-    if (result.isConfirmed) {
-        try {
-            const response = await $.ajax({
-                url: url,
-                type: 'DELETE',
-            });
-            dataTable.ajax.reload();
-            toastr.success(response.message);
-        } catch (error) {
-            toastr.error(error?.responseJSON?.message);
-        }
-    }
-}
