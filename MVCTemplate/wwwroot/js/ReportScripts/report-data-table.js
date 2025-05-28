@@ -17,7 +17,7 @@ function loadDataTableReport() {
                 render: function (data, type, full, meta) {
                     if (data) {
                         // Updated path to match actual image folder location
-                        return `<img src="/Upload/reports/${data}" alt="${full.title}" style="max-height: 60px;" />`;
+                        return `<img src="/Uploads/reports/${data}" alt="${full.title}" style="max-height: 60px;" />`;
                     } else {
                         return 'No Image';
                     }
@@ -71,3 +71,28 @@ $('#updateModal').on('show.bs.modal', function (event) {
     modal.find('#updateImageName').val(imageName);
     modal.find('#updateDescription').val(description);
 });
+
+async function Delete(url) {
+    const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            const response = await $.ajax({
+                url: url,
+                type: 'DELETE',
+            });
+            dataTable.ajax.reload();
+            toastr.success(response.message);
+        } catch (error) {
+            toastr.error(error?.responseJSON?.message);
+        }
+    }
+}
