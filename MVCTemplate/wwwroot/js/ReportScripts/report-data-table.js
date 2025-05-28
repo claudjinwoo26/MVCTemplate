@@ -1,13 +1,16 @@
 ﻿$(document).ready(function () {
     loadDataTableReport();
 
-    // Click-to-enlarge and click-outside-to-close behavior
+    // Click to enlarge one image at a time
     $(document).on('click', function (e) {
-        // If click is on an image, toggle the enlarged class
         if ($(e.target).hasClass('report-thumbnail')) {
+            // Remove enlarged class from all first
+            $('.report-thumbnail.enlarged').not(e.target).removeClass('enlarged');
+
+            // Toggle the clicked image
             $(e.target).toggleClass('enlarged');
         } else {
-            // Clicked outside, remove enlarged from all
+            // Clicked outside any image
             $('.report-thumbnail.enlarged').removeClass('enlarged');
         }
     });
@@ -27,7 +30,7 @@ function loadDataTableReport() {
                 autoWidth: true,
                 render: function (data, type, full, meta) {
                     if (data) {
-                        return `<img src="/Uploads/reports/${data}" alt="${full.title}" class="report-thumbnail" />`;
+                        return `<img src="/uploads/reports/${data}" alt="${full.title}" class="report-thumbnail" />`; // was Uploads/reports before
                     } else {
                         return 'No Image';
                     }
