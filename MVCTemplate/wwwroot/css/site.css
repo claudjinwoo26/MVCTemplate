@@ -22,10 +22,13 @@ body {
 }
 
 .report-thumbnail {
-    max-height: 60px;
+    width: 100px; /* Fixed width */
+    height: 60px; /* Fixed height */
+    object-fit: cover; /* Crop or scale image to fill the box */
     transition: transform 0.3s ease, z-index 0.3s;
     cursor: pointer;
     border-radius: 5px;
+    display: inline-block;
 }
 
 /*.report-thumbnail:hover {
