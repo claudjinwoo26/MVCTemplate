@@ -1,5 +1,16 @@
 ﻿$(document).ready(function () {
     loadDataTableReport();
+
+    // Click-to-enlarge and click-outside-to-close behavior
+    $(document).on('click', function (e) {
+        // If click is on an image, toggle the enlarged class
+        if ($(e.target).hasClass('report-thumbnail')) {
+            $(e.target).toggleClass('enlarged');
+        } else {
+            // Clicked outside, remove enlarged from all
+            $('.report-thumbnail.enlarged').removeClass('enlarged');
+        }
+    });
 });
 
 function loadDataTableReport() {
