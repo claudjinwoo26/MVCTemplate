@@ -16,8 +16,7 @@ function loadDataTableReport() {
                 autoWidth: true,
                 render: function (data, type, full, meta) {
                     if (data) {
-                        // Updated path to match actual image folder location
-                        return `<img src="/Uploads/reports/${data}" alt="${full.title}" style="max-height: 60px;" />`;
+                        return `<img src="/Uploads/reports/${data}" alt="${full.title}" class="report-thumbnail" />`;
                     } else {
                         return 'No Image';
                     }
