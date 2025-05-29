@@ -57,6 +57,29 @@ namespace MVCTemplate.Areas.Admin.Controllers
             return data;
         }
 
+        [HttpPost]
+        [Route("/Admin/Package/GetPackagesCreatedPerDay")]
+        public IActionResult GetPackagesCreatedPerDay()
+        {
+            var grouped = _context.Packages
+                .AsEnumerable()
+                .GroupBy(p => p.CreatedAt.Date)
+                .OrderBy(g => g.Key)
+                .Select(g => new
+                {
+                    Date = g.Key.ToString("MM/dd/yyyy"),
+                    Count = g.Count()
+                })
+                .ToList();
+
+            List<string> labels = grouped.Select(g => g.Date).ToList();
+            List<int> counts = grouped.Select(g => g.Count).ToList();
+
+            return Json(new List<object> { labels, counts });
+        }
+
+
+
         public IActionResult PDF() 
         {
             var document = new Document
