@@ -1,3 +1,21 @@
+
+// Custom filter to handle min/max quantity filtering
+$.fn.dataTable.ext.search.push(
+    function (settings, data, dataIndex) {
+        var min = parseInt($('#minQuantity').val(), 10);
+        var max = parseInt($('#maxQuantity').val(), 10);
+        var quantity = parseInt(data[2]) || 0;
+
+        if ((isNaN(min) && isNaN(max)) ||
+            (isNaN(min) && quantity <= max) ||
+            (min <= quantity && isNaN(max)) ||
+            (min <= quantity && quantity <= max)) {
+            return true;
+        }
+        return false;
+    }
+);
+
 $(document).ready(function () {
     loadDataTable();
 });
@@ -33,6 +51,11 @@ $('#nameSearch').on('keyup change', function () {
 // Filter by Description column
 $('#descriptionSearch').on('keyup change', function () {
     dataTable.column(1).search(this.value).draw();
+});
+
+// New event handler for min and max quantity filtering
+$('#minQuantity, #maxQuantity').on('keyup change', function () {
+    dataTable.draw();
 });
 
 // Call loadDataTable() to initialize your DataTable when the page loads
