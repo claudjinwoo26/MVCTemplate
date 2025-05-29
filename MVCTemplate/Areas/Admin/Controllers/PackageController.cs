@@ -14,6 +14,7 @@ using Aspose.Pdf;
 using Aspose.Pdf.Text;
 using System.Data;
 using System.IO;
+using ClosedXML.Excel;
 //using System.IO.Packaging;
 
 namespace MVCTemplate.Areas.Admin.Controllers
@@ -78,6 +79,44 @@ namespace MVCTemplate.Areas.Admin.Controllers
             return Json(new List<object> { labels, counts });
         }
 
+        [HttpPost]
+        public IActionResult ExportFilteredToExcel([FromBody] List<Package> filteredPackages)
+        {
+            ExcelPackage.License.SetNonCommercialPersonal("My Name"); // Set this once, if not already done globally
+
+            using var package = new ExcelPackage();
+            var worksheet = package.Workbook.Worksheets.Add("Packages");
+
+            // Add headers
+            worksheet.Cells[1, 1].Value = "Name";
+            worksheet.Cells[1, 2].Value = "Description";
+            worksheet.Cells[1, 3].Value = "Priority";
+            worksheet.Cells[1, 4].Value = "Created At";
+            worksheet.Cells[1, 5].Value = "Updated At";
+
+            // Add rows
+            for (int i = 0; i < filteredPackages.Count; i++)
+            {
+                var p = filteredPackages[i];
+                worksheet.Cells[i + 2, 1].Value = p.Name;
+                worksheet.Cells[i + 2, 2].Value = p.Description;
+                worksheet.Cells[i + 2, 3].Value = p.Priority;
+                worksheet.Cells[i + 2, 4].Value = p.CreatedAt.ToString("MM/dd/yyyy hh:mm tt");
+                worksheet.Cells[i + 2, 5].Value = p.UpdatedAt.ToString("MM/dd/yyyy hh:mm tt");
+            }
+
+            // Optional: Auto-fit columns
+            worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
+            // Return as file
+            var stream = new MemoryStream();
+            package.SaveAs(stream);
+            stream.Position = 0;
+
+            return File(stream,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "FilteredPackages.xlsx");
+        } // export excel that is filtered
 
 
         public IActionResult PDF() 

@@ -127,3 +127,37 @@ $('#updateModal').on('show.bs.modal', function (event) {
     modal.find('.modal-body #description').val(description);
     modal.find('.modal-body #priority').val(priority);
 });
+
+$(document).ready(function () {
+    $('#button-excelFiltered').on('click', function () {
+        let filteredData = dataTable.rows({ search: 'applied' }).data().toArray();
+
+        if (filteredData.length === 0) {
+            alert("No data available to export.");
+            return;
+        }
+
+        $.ajax({
+            url: '/Admin/Package/ExportFilteredToExcel',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(filteredData),
+            xhrFields: {
+                responseType: 'blob'
+            },
+            success: function (data, status, xhr) {
+                const blob = new Blob([data], { type: xhr.getResponseHeader('Content-Type') });
+                const link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = "FilteredPackages.xlsx";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            },
+            error: function (xhr) {
+                console.error(xhr.responseText);
+                alert("Failed to export filtered data.");
+            }
+        });
+    });
+});
