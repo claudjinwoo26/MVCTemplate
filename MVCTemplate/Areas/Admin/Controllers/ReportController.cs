@@ -11,6 +11,10 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using OfficeOpenXml;
+using OfficeOpenXml.Drawing;
+using System.Drawing;
+using DocumentFormat.OpenXml.InkML;
 
 namespace MVCTemplate.Controllers
 {
@@ -26,6 +30,94 @@ namespace MVCTemplate.Controllers
             _context = context;
             _webHostEnvironment = webHostEnvironment;
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ExportToExcel()
+        {
+            ExcelPackage.License.SetNonCommercialPersonal("My Name");
+
+            var reports = await _context.Reports.ToListAsync();
+            var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads/reports");
+
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Reports");
+
+                // Header row
+                worksheet.Cells[1, 1].Value = "Title";
+                worksheet.Cells[1, 2].Value = "Description";
+                worksheet.Cells[1, 3].Value = "Image";
+
+                int row = 2;
+                foreach (var report in reports)
+                {
+                    worksheet.Cells[row, 1].Value = report.Title;
+                    worksheet.Cells[row, 2].Value = report.Description;
+
+                    if (!string.IsNullOrEmpty(report.ImageName))
+                    {
+                        var imagePath = Path.Combine(filePath, report.ImageName);
+                        if (System.IO.File.Exists(imagePath))
+                        {
+                            using (var imageStream = new FileStream(imagePath, FileMode.Open, FileAccess.Read))
+                            {
+                                var excelImage = worksheet.Drawings.AddPicture($"img_{row}", imageStream);
+
+                                // Anchor to the cell C{row}
+                                excelImage.SetPosition(row - 1, 5, 2, 5); // (rowIndex, offsetY, colIndex, offsetX)
+                                excelImage.SetSize(80, 80);
+                                excelImage.EditAs = eEditAs.OneCell; // Anchor image to cell
+
+                                // Lock image and maintain aspect ratio
+                                excelImage.Locked = true;
+                                excelImage.LockAspectRatio = true;
+
+                                // Adjust row height and column width to fit image
+                                worksheet.Row(row).Height = 60;
+                                worksheet.Column(3).Width = (80 - 5) / 7.0; // Approx 10.7 for image to show well
+                            }
+                        }
+                    }
+
+                    row++;
+                }
+
+                // Formatting headers and columns
+                worksheet.Column(1).Width = 30;
+                worksheet.Column(2).Width = 50;
+                worksheet.Row(1).Style.Font.Bold = true;
+
+                // Add auto filter
+                worksheet.Cells["A1:B1"].AutoFilter = true;
+
+                // Lock all cells
+                worksheet.Cells.Style.Locked = true;
+
+                // Protect worksheet - disable image editing
+                worksheet.Protection.SetPassword("YourPassword"); // Change this
+                worksheet.Protection.AllowSelectLockedCells = true;
+                worksheet.Protection.AllowSelectUnlockedCells = true;
+                worksheet.Protection.AllowAutoFilter = true;
+                worksheet.Protection.AllowEditObject = false;
+                worksheet.Protection.AllowEditScenarios = false;
+                worksheet.Protection.IsProtected = true;
+
+                // Protect workbook structure
+                package.Workbook.Protection.SetPassword("YourPassword");
+                package.Workbook.Protection.LockStructure = true;
+                package.Workbook.Protection.LockWindows = true;
+
+                // Save and return the Excel file
+                var stream = new MemoryStream();
+                package.SaveAs(stream);
+                stream.Position = 0;
+
+                string fileName = $"Reports.xlsx";
+                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            }
+        }
+
+
 
         // GET: /Report/Index
         public IActionResult Index()
