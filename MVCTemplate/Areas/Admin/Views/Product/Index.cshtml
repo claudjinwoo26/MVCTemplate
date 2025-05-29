@@ -56,6 +56,18 @@
     <!-- Product Table -->
     <div class="main-card mb-3 card">
         <div class="card-body">
+
+            <div class="mb-3 row">
+                <div class="col-md-4">
+                    <label for="nameSearch" class="form-label">Search by Name:</label>
+                    <input type="text" id="nameSearch" class="form-control" placeholder="Package name..." />
+                </div>
+                <div class="col-md-4">
+                    <label for="descriptionSearch" class="form-label">Search by Description:</label>
+                    <input type="text" id="descriptionSearch" class="form-control" placeholder="Package description..." />
+                </div>
+            </div>
+
             <div class="table-responsive">
                 <table style="width: 100%;" id="productTable" class="table table-hover table-striped table-bordered display nowrap">
                     <thead>

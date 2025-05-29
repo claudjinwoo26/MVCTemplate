@@ -26,6 +26,15 @@ function loadDataTable() {
     });
 }
 
+$('#nameSearch').on('keyup change', function () {
+    dataTable.column(0).search(this.value).draw(); // 0 is the index for the "Name" column
+});
+
+// Filter by Description column
+$('#descriptionSearch').on('keyup change', function () {
+    dataTable.column(1).search(this.value).draw();
+});
+
 // Call loadDataTable() to initialize your DataTable when the page loads
 
 $('#updateModal').on('show.bs.modal', function (event) {
