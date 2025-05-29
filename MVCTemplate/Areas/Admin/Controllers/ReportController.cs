@@ -15,6 +15,12 @@ using OfficeOpenXml;
 using OfficeOpenXml.Drawing;
 using System.Drawing;
 using DocumentFormat.OpenXml.InkML;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
+using QuestPDF.Drawing;
+using QuestPDF.Elements;
+using QuestPDF.Previewer;
 
 namespace MVCTemplate.Controllers
 {
@@ -30,6 +36,79 @@ namespace MVCTemplate.Controllers
             _context = context;
             _webHostEnvironment = webHostEnvironment;
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ExportToPdf()
+        {
+            QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+
+            var reports = await _context.Reports.ToListAsync();
+            var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads/reports");
+
+            byte[] pdfBytes = Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Margin(20);
+                    page.Size(PageSizes.A4);
+
+                    page.Content().Table(table =>
+                    {
+                        // Define columns count and relative widths
+                        table.ColumnsDefinition(columns =>
+                        {
+                            columns.RelativeColumn(3);  // Title column
+                            columns.RelativeColumn(5);  // Description column
+                            columns.RelativeColumn(3);  // Image column
+                        });
+
+                        // Header row styling
+                        table.Header(header =>
+                        {
+                            header.Cell().Element(CellStyle).Text("Title").Bold();
+                            header.Cell().Element(CellStyle).Text("Description").Bold();
+                            header.Cell().Element(CellStyle).Text("Image").Bold();
+                        });
+
+                        // Data rows
+                        foreach (var report in reports)
+                        {
+                            table.Cell().Element(CellStyle).Text(report.Title ?? "");
+                            table.Cell().Element(CellStyle).Text(report.Description ?? "");
+
+                            if (!string.IsNullOrEmpty(report.ImageName))
+                            {
+                                var imagePath = Path.Combine(filePath, report.ImageName);
+                                if (System.IO.File.Exists(imagePath))
+                                {
+                                    table.Cell().Element(CellStyle).Image(imagePath, ImageScaling.FitArea);
+                                }
+                                else
+                                {
+                                    table.Cell().Element(CellStyle).Text("[Image not found]");
+                                }
+                            }
+                            else
+                            {
+                                table.Cell().Element(CellStyle).Text("[No image]");
+                            }
+                        }
+                    });
+                });
+            }).GeneratePdf();
+
+            return File(pdfBytes, "application/pdf", "Reports.pdf");
+
+            // Local function for cell styling
+            IContainer CellStyle(IContainer container) =>
+                container
+                    .Border(1)
+                    .BorderColor(Colors.Grey.Medium)
+                    .Padding(5)
+                    .AlignMiddle()
+                    .AlignCenter();
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> ExportToExcel()
