@@ -82,33 +82,38 @@ namespace MVCTemplate.Areas.Admin.Controllers
         [HttpPost]
         public IActionResult ExportFilteredToExcel([FromBody] List<Package> filteredPackages)
         {
-            ExcelPackage.License.SetNonCommercialPersonal("My Name"); // Set this once, if not already done globally
+            ExcelPackage.License.SetNonCommercialPersonal("My Name");
 
             using var package = new ExcelPackage();
-            var worksheet = package.Workbook.Worksheets.Add("Packages");
+            var worksheet = package.Workbook.Worksheets.Add("Filtered Packages");
 
-            // Add headers
+            // Add header row
             worksheet.Cells[1, 1].Value = "Name";
             worksheet.Cells[1, 2].Value = "Description";
             worksheet.Cells[1, 3].Value = "Priority";
             worksheet.Cells[1, 4].Value = "Created At";
             worksheet.Cells[1, 5].Value = "Updated At";
 
-            // Add rows
+            // Fill data rows
             for (int i = 0; i < filteredPackages.Count; i++)
             {
                 var p = filteredPackages[i];
-                worksheet.Cells[i + 2, 1].Value = p.Name;
-                worksheet.Cells[i + 2, 2].Value = p.Description;
-                worksheet.Cells[i + 2, 3].Value = p.Priority;
-                worksheet.Cells[i + 2, 4].Value = p.CreatedAt.ToString("MM/dd/yyyy hh:mm tt");
-                worksheet.Cells[i + 2, 5].Value = p.UpdatedAt.ToString("MM/dd/yyyy hh:mm tt");
+                int row = i + 2;
+
+                worksheet.Cells[row, 1].Value = p.Name;
+                worksheet.Cells[row, 2].Value = p.Description;
+                worksheet.Cells[row, 3].Value = p.Priority;
+                worksheet.Cells[row, 4].Value = p.CreatedAt.ToString("yyyy-MM-dd HH:mm");
+                worksheet.Cells[row, 5].Value = p.UpdatedAt.ToString("yyyy-MM-dd HH:mm");
             }
+
+            // Apply AutoFilter to header row
+            worksheet.Cells[1, 1, 1, 5].AutoFilter = true;
 
             // Optional: Auto-fit columns
             worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
 
-            // Return as file
+            // Return the Excel file
             var stream = new MemoryStream();
             package.SaveAs(stream);
             stream.Position = 0;
@@ -116,7 +121,8 @@ namespace MVCTemplate.Areas.Admin.Controllers
             return File(stream,
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 "FilteredPackages.xlsx");
-        } // export excel that is filtered
+        }
+        // export excel that is filtered
 
 
         public IActionResult PDF() 
