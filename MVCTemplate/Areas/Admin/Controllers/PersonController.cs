@@ -1,9 +1,11 @@
+using DocumentFormat.OpenXml.InkML;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using MVCtemplate.DataAccess.Data;
 using MVCTemplate.DataAccess.Repository.IRepository;
 using MVCTemplate.Models;
 using MVCTemplate.Util;
@@ -31,10 +33,12 @@ namespace MVCTemplate.Areas.Admin.Controllers
         }
 
         private IUnitOfWork _unitOfWork;
+        private readonly ApplicationDbContext _context;
 
-        public PersonController(IUnitOfWork unitOfWork)
+        public PersonController(IUnitOfWork unitOfWork, ApplicationDbContext context)
         {
             _unitOfWork = unitOfWork;
+            _context = context;
         }
 
         public IActionResult Create()
@@ -55,6 +59,27 @@ namespace MVCTemplate.Areas.Admin.Controllers
             //not working
             return View();
         }
+
+        [HttpPost]
+        public IActionResult GetPersonsData()
+        {
+            // Fetch categories where there is at least one person linked by CategoryId
+            var data = _context.Categorys
+                .Where(c => _context.Persons.Any(p => p.CategoryId == c.IdCategory))
+                .Select(c => new
+                {
+                    CategoryName = c.NameCategory, // Changed here
+                    EmployeeCount = _context.Persons.Count(p => p.CategoryId == c.IdCategory) // Changed here
+                })
+                .ToList();
+
+            var labels = data.Select(d => d.CategoryName).ToList();
+            var counts = data.Select(d => d.EmployeeCount).ToList();
+
+            return Json(new object[] { labels, counts });
+        }
+
+
 
         [HttpPost]
         public IActionResult Create(Person person)
