@@ -207,6 +207,90 @@ namespace MVCTemplate.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> ExportFilteredToExcel(string? titleFilter)
+        {
+            ExcelPackage.License.SetNonCommercialPersonal("My Name");
+
+            var reportsQuery = _context.Reports.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(titleFilter))
+            {
+                reportsQuery = reportsQuery.Where(r => r.Title != null && r.Title.Contains(titleFilter));
+            }
+
+            var reports = await reportsQuery.ToListAsync();
+            var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads/reports");
+
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Filtered Reports");
+
+                // Header row
+                worksheet.Cells[1, 1].Value = "Title";
+                worksheet.Cells[1, 2].Value = "Description";
+                worksheet.Cells[1, 3].Value = "Image";
+
+                int row = 2;
+                foreach (var report in reports)
+                {
+                    worksheet.Cells[row, 1].Value = report.Title;
+                    worksheet.Cells[row, 2].Value = report.Description;
+
+                    if (!string.IsNullOrEmpty(report.ImageName))
+                    {
+                        var imagePath = Path.Combine(filePath, report.ImageName);
+                        if (System.IO.File.Exists(imagePath))
+                        {
+                            using (var imageStream = new FileStream(imagePath, FileMode.Open, FileAccess.Read))
+                            {
+                                var excelImage = worksheet.Drawings.AddPicture($"img_{row}", imageStream);
+
+                                excelImage.SetPosition(row - 1, 5, 2, 5);
+                                excelImage.SetSize(80, 80);
+                                excelImage.EditAs = eEditAs.OneCell;
+                                excelImage.Locked = true;
+                                excelImage.LockAspectRatio = true;
+
+                                worksheet.Row(row).Height = 60;
+                                worksheet.Column(3).Width = (80 - 5) / 7.0;
+                            }
+                        }
+                    }
+
+                    row++;
+                }
+
+                // Format headers
+                worksheet.Column(1).Width = 30;
+                worksheet.Column(2).Width = 50;
+                worksheet.Row(1).Style.Font.Bold = true;
+
+                worksheet.Cells["A1:B1"].AutoFilter = true;
+                worksheet.Cells.Style.Locked = true;
+
+                worksheet.Protection.SetPassword("YourPassword");
+                worksheet.Protection.AllowSelectLockedCells = true;
+                worksheet.Protection.AllowSelectUnlockedCells = true;
+                worksheet.Protection.AllowAutoFilter = true;
+                worksheet.Protection.AllowEditObject = false;
+                worksheet.Protection.AllowEditScenarios = false;
+                worksheet.Protection.IsProtected = true;
+
+                package.Workbook.Protection.SetPassword("YourPassword");
+                package.Workbook.Protection.LockStructure = true;
+                package.Workbook.Protection.LockWindows = true;
+
+                var stream = new MemoryStream();
+                package.SaveAs(stream);
+                stream.Position = 0;
+
+                string fileName = $"FilteredReports.xlsx";
+                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            }
+        }
+
+
+        [HttpGet]
         public async Task<IActionResult> ExportFilteredToPdf(string? titleFilter) // not all
         {
             QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;

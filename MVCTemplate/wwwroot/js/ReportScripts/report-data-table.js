@@ -17,17 +17,27 @@
 
     // Add export filtered PDF button event handler
     $('#exportFilteredPdfBtn').on('click', function () {
-        // Get current DataTable search filter value
         var table = $('#reportTable').DataTable();
         var searchValue = table.search().trim();
 
-        // Build URL with filter query param if exists
         var url = '/Admin/Report/ExportFilteredToPdf';
         if (searchValue) {
             url += '?titleFilter=' + encodeURIComponent(searchValue);
         }
 
-        // Open the export URL in a new tab/window to trigger download
+        window.open(url, '_blank');
+    });
+
+    // Add export filtered Excel button event handler
+    $('#exportFilteredExcelBtn').on('click', function () {
+        var table = $('#reportTable').DataTable();
+        var searchValue = table.search().trim();
+
+        var url = '/Admin/Report/ExportFilteredToExcel';
+        if (searchValue) {
+            url += '?titleFilter=' + encodeURIComponent(searchValue);
+        }
+
         window.open(url, '_blank');
     });
 });
