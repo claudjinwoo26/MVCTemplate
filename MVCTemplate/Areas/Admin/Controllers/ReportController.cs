@@ -52,62 +52,84 @@ namespace MVCTemplate.Controllers
                     page.Margin(20);
                     page.Size(PageSizes.A4);
 
-                    // Add footer with report generation date
+                    // Header with page number
+                    page.Header()
+                        .AlignRight()
+                        .Text(text =>
+                        {
+                            text.Span("Page ").FontSize(10).FontColor(Colors.Grey.Medium);
+                            text.CurrentPageNumber().FontSize(10).FontColor(Colors.Grey.Medium);
+                            text.Span(" of ").FontSize(10).FontColor(Colors.Grey.Medium);
+                            text.TotalPages().FontSize(10).FontColor(Colors.Grey.Medium);
+                        });
+
+                    // Footer with report generation date
                     page.Footer()
                         .AlignRight()
                         .Text($"Report generated on {DateTime.Now:MM-dd-yyyy}")
                         .FontSize(10)
                         .FontColor(Colors.Grey.Medium);
 
-
-                    page.Content().Table(table =>
+                    page.Content().Column(column =>
                     {
-                        // Define columns count and relative widths
-                        table.ColumnsDefinition(columns =>
-                        {
-                            columns.RelativeColumn(3);  // Title column
-                            columns.RelativeColumn(5);  // Description column
-                            columns.RelativeColumn(3);  // Image column
-                        });
+                        // Table title
+                        column.Item().Element(container =>
+                            container
+                                .PaddingBottom(10)
+                                .AlignCenter()
+                                .Text("Reports Data")
+                                .FontSize(16)
+                                .Bold()
+                                .Underline()
+                        );
 
-                        // Header row styling
-                        table.Header(header =>
+                        // Reports data table
+                        column.Item().Table(table =>
                         {
-                            header.Cell().Element(CellStyle).Text("Title").Bold();
-                            header.Cell().Element(CellStyle).Text("Description").Bold();
-                            header.Cell().Element(CellStyle).Text("Image").Bold();
-                        });
-
-                        // Data rows
-                        foreach (var report in reports)
-                        {
-                            table.Cell().Element(CellStyle).Text(report.Title ?? "");
-                            table.Cell().Element(CellStyle).Text(report.Description ?? "");
-
-                            if (!string.IsNullOrEmpty(report.ImageName))
+                            table.ColumnsDefinition(columns =>
                             {
-                                var imagePath = Path.Combine(filePath, report.ImageName);
-                                if (System.IO.File.Exists(imagePath))
+                                columns.RelativeColumn(3);  // Title
+                                columns.RelativeColumn(5);  // Description
+                                columns.RelativeColumn(3);  // Image
+                            });
+
+                            table.Header(header =>
+                            {
+                                header.Cell().Element(CellStyle).Text("Title").Bold();
+                                header.Cell().Element(CellStyle).Text("Description").Bold();
+                                header.Cell().Element(CellStyle).Text("Image").Bold();
+                            });
+
+                            foreach (var report in reports)
+                            {
+                                table.Cell().Element(CellStyle).Text(report.Title ?? "");
+                                table.Cell().Element(CellStyle).Text(report.Description ?? "");
+
+                                if (!string.IsNullOrEmpty(report.ImageName))
                                 {
-                                    table.Cell().Element(CellStyle).Image(imagePath, ImageScaling.FitArea);
+                                    var imagePath = Path.Combine(filePath, report.ImageName);
+                                    if (System.IO.File.Exists(imagePath))
+                                    {
+                                        table.Cell().Element(CellStyle).Image(imagePath, ImageScaling.FitArea);
+                                    }
+                                    else
+                                    {
+                                        table.Cell().Element(CellStyle).Text("[Image not found]");
+                                    }
                                 }
                                 else
                                 {
-                                    table.Cell().Element(CellStyle).Text("[Image not found]");
+                                    table.Cell().Element(CellStyle).Text("[No image]");
                                 }
                             }
-                            else
-                            {
-                                table.Cell().Element(CellStyle).Text("[No image]");
-                            }
-                        }
+                        });
                     });
                 });
             }).GeneratePdf();
 
             return File(pdfBytes, "application/pdf", "Reports.pdf");
 
-            // Local function for cell styling
+            // Cell styling helper
             IContainer CellStyle(IContainer container) =>
                 container
                     .Border(1)
@@ -116,6 +138,9 @@ namespace MVCTemplate.Controllers
                     .AlignMiddle()
                     .AlignCenter();
         }
+
+
+
 
         [HttpGet]
         public async Task<IActionResult> ExportToExcel()
