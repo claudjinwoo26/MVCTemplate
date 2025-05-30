@@ -292,37 +292,55 @@ namespace MVCTemplate.Controllers
 
                 // Row 1 - Title
                 worksheet.Cells["A1:C1"].Merge = true;
-                worksheet.Cells["A1"].Value = "Reports Data";
+                worksheet.Cells["A1"].Value = "Filtered Reports Data";
                 worksheet.Cells["A1"].Style.Font.Size = 18;
                 worksheet.Cells["A1"].Style.Font.Bold = true;
                 worksheet.Cells["A1"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
                 worksheet.Row(1).Height = 25;
 
-                // Row 2 - Generated on date & time
+                // Row 2 - Name filter
                 worksheet.Cells["A2:C2"].Merge = true;
-                worksheet.Cells["A2"].Value = $"Generated on: {DateTime.Now:MM-dd-yyyy HH:mm}";
+                string namePart = string.IsNullOrWhiteSpace(titleFilter) ? "" : titleFilter;
+                worksheet.Cells["A2"].Value = $"With Name: {namePart}";
                 worksheet.Cells["A2"].Style.Font.Size = 12;
+                worksheet.Cells["A2"].Style.Font.Italic = true;
                 worksheet.Cells["A2"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
-                worksheet.Row(2).Height = 20;
+                worksheet.Row(2).Height = 18;
 
-                // Row 3 - Headers
-                worksheet.Cells[3, 1].Value = "Title";
-                worksheet.Cells[3, 2].Value = "Description";
-                worksheet.Cells[3, 3].Value = "Image";
+                // Row 3 - Description filter
+                worksheet.Cells["A3:C3"].Merge = true;
+                string descPart = string.IsNullOrWhiteSpace(descriptionFilter) ? "" : descriptionFilter;
+                worksheet.Cells["A3"].Value = $"With Description: {descPart}";
+                worksheet.Cells["A3"].Style.Font.Size = 12;
+                worksheet.Cells["A3"].Style.Font.Italic = true;
+                worksheet.Cells["A3"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                worksheet.Row(3).Height = 18;
+
+                // Row 4 - Generated on
+                worksheet.Cells["A4:C4"].Merge = true;
+                worksheet.Cells["A4"].Value = $"Generated on: {DateTime.Now:MM-dd-yyyy HH:mm}";
+                worksheet.Cells["A4"].Style.Font.Size = 12;
+                worksheet.Cells["A4"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                worksheet.Row(4).Height = 20;
+
+                // Row 5 - Headers
+                worksheet.Cells[5, 1].Value = "Title";
+                worksheet.Cells[5, 2].Value = "Description";
+                worksheet.Cells[5, 3].Value = "Image";
 
                 var blueBackground = System.Drawing.Color.FromArgb(0, 51, 102);
-                worksheet.Cells["A1:C3"].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                worksheet.Cells["A1:C3"].Style.Fill.BackgroundColor.SetColor(blueBackground);
-                worksheet.Cells["A1:C3"].Style.Font.Color.SetColor(System.Drawing.Color.White);
+                worksheet.Cells["A1:C5"].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                worksheet.Cells["A1:C5"].Style.Fill.BackgroundColor.SetColor(blueBackground);
+                worksheet.Cells["A1:C5"].Style.Font.Color.SetColor(System.Drawing.Color.White);
 
-                worksheet.Row(3).Height = 22;
-                worksheet.Cells["A3:C3"].Style.Font.Bold = true;
-                worksheet.Cells["A3:C3"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
+                worksheet.Row(5).Height = 22;
+                worksheet.Cells["A5:C5"].Style.Font.Bold = true;
+                worksheet.Cells["A5:C5"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
 
                 worksheet.Column(1).Width = 30;
                 worksheet.Column(2).Width = 50;
 
-                int row = 4;
+                int row = 6;
                 var lightGreen = System.Drawing.Color.FromArgb(198, 239, 206);
                 var darkGreen = System.Drawing.Color.FromArgb(155, 187, 89);
 
@@ -377,7 +395,7 @@ namespace MVCTemplate.Controllers
                     row++;
                 }
 
-                using (var range = worksheet.Cells[3, 1, row - 1, 3])
+                using (var range = worksheet.Cells[5, 1, row - 1, 3])
                 {
                     range.Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
                     range.Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
@@ -385,18 +403,18 @@ namespace MVCTemplate.Controllers
                     range.Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
 
                     var thick = OfficeOpenXml.Style.ExcelBorderStyle.Medium;
-                    worksheet.Cells["A1:C3"].Style.Border.Top.Style = thick;
-                    worksheet.Cells["A1:C3"].Style.Border.Bottom.Style = thick;
-                    worksheet.Cells["A1:C3"].Style.Border.Left.Style = thick;
-                    worksheet.Cells["A1:C3"].Style.Border.Right.Style = thick;
+                    worksheet.Cells["A1:C5"].Style.Border.Top.Style = thick;
+                    worksheet.Cells["A1:C5"].Style.Border.Bottom.Style = thick;
+                    worksheet.Cells["A1:C5"].Style.Border.Left.Style = thick;
+                    worksheet.Cells["A1:C5"].Style.Border.Right.Style = thick;
 
-                    worksheet.Cells[3, 1, row - 1, 3].Style.Border.Top.Style = thick;
-                    worksheet.Cells[3, 1, row - 1, 3].Style.Border.Bottom.Style = thick;
-                    worksheet.Cells[3, 1, row - 1, 3].Style.Border.Left.Style = thick;
-                    worksheet.Cells[3, 1, row - 1, 3].Style.Border.Right.Style = thick;
+                    worksheet.Cells[5, 1, row - 1, 3].Style.Border.Top.Style = thick;
+                    worksheet.Cells[5, 1, row - 1, 3].Style.Border.Bottom.Style = thick;
+                    worksheet.Cells[5, 1, row - 1, 3].Style.Border.Left.Style = thick;
+                    worksheet.Cells[5, 1, row - 1, 3].Style.Border.Right.Style = thick;
                 }
 
-                worksheet.Cells["A3:C3"].AutoFilter = true;
+                worksheet.Cells["A5:C5"].AutoFilter = true;
 
                 worksheet.Cells.Style.Locked = true;
                 worksheet.Protection.SetPassword("YourPassword");
@@ -419,6 +437,7 @@ namespace MVCTemplate.Controllers
                 return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
             }
         }
+
 
 
         [HttpGet]
