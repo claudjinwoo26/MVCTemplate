@@ -70,6 +70,7 @@ namespace MVCTemplate.Controllers
                         .FontSize(10)
                         .FontColor(Colors.Grey.Medium);
 
+                    // Main content
                     page.Content().Column(column =>
                     {
                         // Table title
@@ -93,6 +94,7 @@ namespace MVCTemplate.Controllers
                                 columns.RelativeColumn(3);  // Image
                             });
 
+                            // Table header
                             table.Header(header =>
                             {
                                 header.Cell().Element(CellStyle).Text("Title").Bold();
@@ -100,27 +102,41 @@ namespace MVCTemplate.Controllers
                                 header.Cell().Element(CellStyle).Text("Image").Bold();
                             });
 
+                            // Table rows
                             foreach (var report in reports)
                             {
-                                table.Cell().Element(CellStyle).Text(report.Title ?? "");
-                                table.Cell().Element(CellStyle).Text(report.Description ?? "");
+                                // Title cell
+                                table.Cell().Element(CellStyle).Element(cell =>
+                                    cell.MinimalBox().ShowOnce().Text(report.Title ?? "")
+                                );
 
-                                if (!string.IsNullOrEmpty(report.ImageName))
+                                // Description cell
+                                table.Cell().Element(CellStyle).Element(cell =>
+                                    cell.MinimalBox().ShowOnce().Text(report.Description ?? "")
+                                );
+
+                                // Image cell
+                                table.Cell().Element(CellStyle).Element(cell =>
                                 {
-                                    var imagePath = Path.Combine(filePath, report.ImageName);
-                                    if (System.IO.File.Exists(imagePath))
+                                    if (!string.IsNullOrEmpty(report.ImageName))
                                     {
-                                        table.Cell().Element(CellStyle).Image(imagePath, ImageScaling.FitArea);
+                                        var imagePath = Path.Combine(filePath, report.ImageName);
+                                        if (System.IO.File.Exists(imagePath))
+                                        {
+                                            cell.MinimalBox()
+                                                .ShowOnce()
+                                                .Image(imagePath, ImageScaling.FitWidth);
+                                        }
+                                        else
+                                        {
+                                            cell.Text("[Image not found]");
+                                        }
                                     }
                                     else
                                     {
-                                        table.Cell().Element(CellStyle).Text("[Image not found]");
+                                        cell.Text("[No image]");
                                     }
-                                }
-                                else
-                                {
-                                    table.Cell().Element(CellStyle).Text("[No image]");
-                                }
+                                });
                             }
                         });
                     });
@@ -129,7 +145,7 @@ namespace MVCTemplate.Controllers
 
             return File(pdfBytes, "application/pdf", "Reports.pdf");
 
-            // Cell styling helper
+            // Helper for consistent cell styling
             IContainer CellStyle(IContainer container) =>
                 container
                     .Border(1)
@@ -138,7 +154,6 @@ namespace MVCTemplate.Controllers
                     .AlignMiddle()
                     .AlignCenter();
         }
-
 
 
 
