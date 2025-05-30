@@ -267,12 +267,8 @@ namespace MVCTemplate.Controllers
             }
         }
 
-
-
-
-
         [HttpGet]
-        public async Task<IActionResult> ExportFilteredToExcel(string? titleFilter)
+        public async Task<IActionResult> ExportFilteredToExcel(string? titleFilter, string? descriptionFilter)
         {
             ExcelPackage.License.SetNonCommercialPersonal("My Name");
 
@@ -281,6 +277,10 @@ namespace MVCTemplate.Controllers
             if (!string.IsNullOrWhiteSpace(titleFilter))
             {
                 reportsQuery = reportsQuery.Where(r => r.Title != null && r.Title.Contains(titleFilter));
+            }
+            if (!string.IsNullOrWhiteSpace(descriptionFilter))
+            {
+                reportsQuery = reportsQuery.Where(r => r.Description != null && r.Description.Contains(descriptionFilter));
             }
 
             var reports = await reportsQuery.ToListAsync();
@@ -354,9 +354,8 @@ namespace MVCTemplate.Controllers
             }
         }
 
-
         [HttpGet]
-        public async Task<IActionResult> ExportFilteredToPdf(string? titleFilter) // not all
+        public async Task<IActionResult> ExportFilteredToPdf(string? titleFilter, string? descriptionFilter)
         {
             QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 
@@ -365,6 +364,10 @@ namespace MVCTemplate.Controllers
             if (!string.IsNullOrWhiteSpace(titleFilter))
             {
                 reportsQuery = reportsQuery.Where(r => r.Title != null && r.Title.Contains(titleFilter));
+            }
+            if (!string.IsNullOrWhiteSpace(descriptionFilter))
+            {
+                reportsQuery = reportsQuery.Where(r => r.Description != null && r.Description.Contains(descriptionFilter));
             }
 
             var reports = await reportsQuery.ToListAsync();
@@ -437,7 +440,6 @@ namespace MVCTemplate.Controllers
                     .AlignMiddle()
                     .AlignCenter();
         }
-
 
 
         // GET: /Report/Index

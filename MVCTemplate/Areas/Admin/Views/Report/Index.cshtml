@@ -30,7 +30,6 @@
 
                     <button id="exportFilteredPdfBtn" class="btn btn-danger ms-2">Export Filtered PDF</button>
 
-                    <!-- New Export Filtered Excel button -->
                     <button id="exportFilteredExcelBtn" class="btn btn-success ms-2">
                         Export Filtered Excel
                     </button>
@@ -162,7 +161,7 @@
 
     <script>
         $(document).ready(function () {
-            // Filtering by external inputs
+            // External inputs filter DataTables columns
             $('#titleSearch').on('keyup change', function () {
                 $('#reportTable').DataTable().column(0).search(this.value).draw();
             });
