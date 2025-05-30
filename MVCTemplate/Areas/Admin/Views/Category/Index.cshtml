@@ -28,6 +28,19 @@
             </div>
         </div>
     </div>
+
+    <!-- Search Filters -->
+    <div class="mb-3 row">
+        <div class="col-md-4">
+            <label for="nameSearch" class="form-label">Search by Name:</label>
+            <input type="text" id="nameSearch" class="form-control" placeholder="Category name..." />
+        </div>
+        <div class="col-md-4">
+            <label for="codeSearch" class="form-label">Search by Code:</label>
+            <input type="text" id="codeSearch" class="form-control" placeholder="Category code..." />
+        </div>
+    </div>
+
     <div class="main-card mb-3 card">
         <div class="card-body">
             <div class="table-responsive">
@@ -46,10 +59,10 @@
         </div>
     </div>
 </div>
+
 @section Modal
 {
-
-    @* Create Modal*@
+    @* Create Modal *@
     <div class="modal fade" id="createModal" tabindex="-1" role="dialog"
          aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -129,4 +142,15 @@
     <script src="~/js/deleteGeneralSettings.js"></script>
     <script src="~/js/CategoryScripts/category-export.js"></script>
 
+    <script>
+        // External filters
+        // the filter is here instead of data-table.js
+        $('#nameSearch').on('keyup change', function () {
+            dataTable.column(0).search(this.value).draw(); // Name column
+        });
+
+        $('#codeSearch').on('keyup change', function () {
+            dataTable.column(1).search(this.value).draw(); // Code column
+        });
+    </script>
 }
