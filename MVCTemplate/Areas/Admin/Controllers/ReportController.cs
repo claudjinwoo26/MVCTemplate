@@ -179,7 +179,7 @@ namespace MVCTemplate.Controllers
 
                 // Row 2 - Generated on date & time
                 worksheet.Cells["A2:C2"].Merge = true;
-                worksheet.Cells["A2"].Value = $"Generated on: {DateTime.Now:MM-dd-yyyy HH:mm}";
+                worksheet.Cells["A2"].Value = $"Generated on: {DateTime.Now:MM-dd-yyyy hh:mm tt}";
                 worksheet.Cells["A2"].Style.Font.Size = 12;
                 worksheet.Cells["A2"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
                 worksheet.Row(2).Height = 20;
@@ -358,7 +358,7 @@ namespace MVCTemplate.Controllers
 
                 // Row 4 - Generated on
                 worksheet.Cells["A4:C4"].Merge = true;
-                worksheet.Cells["A4"].Value = $"Generated on: {DateTime.Now:MM-dd-yyyy HH:mm}";
+                worksheet.Cells["A4"].Value = $"Generated on: {DateTime.Now:MM-dd-yyyy hh:mm tt}";
                 worksheet.Cells["A4"].Style.Font.Size = 12;
                 worksheet.Cells["A4"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
                 worksheet.Row(4).Height = 20;
