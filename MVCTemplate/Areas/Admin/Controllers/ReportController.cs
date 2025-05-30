@@ -117,11 +117,8 @@ namespace MVCTemplate.Controllers
                     .AlignCenter();
         }
 
-
-
-
         [HttpGet]
-        public async Task<IActionResult> ExportToExcel() // all data are fetched
+        public async Task<IActionResult> ExportToExcel()
         {
             ExcelPackage.License.SetNonCommercialPersonal("My Name");
 
@@ -132,58 +129,124 @@ namespace MVCTemplate.Controllers
             {
                 var worksheet = package.Workbook.Worksheets.Add("Reports");
 
-                // Header row
-                worksheet.Cells[1, 1].Value = "Title";
-                worksheet.Cells[1, 2].Value = "Description";
-                worksheet.Cells[1, 3].Value = "Image";
+                // Row 1 - Title
+                worksheet.Cells["A1:C1"].Merge = true;
+                worksheet.Cells["A1"].Value = "Reports Data";
+                worksheet.Cells["A1"].Style.Font.Size = 18;
+                worksheet.Cells["A1"].Style.Font.Bold = true;
+                worksheet.Cells["A1"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                worksheet.Row(1).Height = 25;
 
-                int row = 2;
+                // Row 2 - Generated on date & time
+                worksheet.Cells["A2:C2"].Merge = true;
+                worksheet.Cells["A2"].Value = $"Generated on: {DateTime.Now:MM-dd-yyyy HH:mm}";
+                worksheet.Cells["A2"].Style.Font.Size = 12;
+                worksheet.Cells["A2"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                worksheet.Row(2).Height = 20;
+
+                // Row 3 - Headers
+                worksheet.Cells[3, 1].Value = "Title";
+                worksheet.Cells[3, 2].Value = "Description";
+                worksheet.Cells[3, 3].Value = "Image";
+
+                // Style first three rows: blue background and white text
+                var blueBackground = System.Drawing.Color.FromArgb(0, 51, 102);
+                worksheet.Cells["A1:C3"].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                worksheet.Cells["A1:C3"].Style.Fill.BackgroundColor.SetColor(blueBackground);
+                worksheet.Cells["A1:C3"].Style.Font.Color.SetColor(System.Drawing.Color.White);
+
+                worksheet.Row(3).Height = 22;
+                worksheet.Cells["A3:C3"].Style.Font.Bold = true;
+                worksheet.Cells["A3:C3"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
+
+                // Set fixed column widths for Title and Description only
+                worksheet.Column(1).Width = 30;
+                worksheet.Column(2).Width = 50;
+
+                int row = 4;
+                var lightGreen = System.Drawing.Color.FromArgb(198, 239, 206);
+                var darkGreen = System.Drawing.Color.FromArgb(155, 187, 89);
+
                 foreach (var report in reports)
                 {
                     worksheet.Cells[row, 1].Value = report.Title;
                     worksheet.Cells[row, 2].Value = report.Description;
 
+                    // Set alternating row colors
+                    var fillColor = (row % 2 == 0) ? lightGreen : darkGreen;
+                    worksheet.Cells[row, 1, row, 3].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                    worksheet.Cells[row, 1, row, 3].Style.Fill.BackgroundColor.SetColor(fillColor);
+
+                    // Insert image if exists
                     if (!string.IsNullOrEmpty(report.ImageName))
                     {
                         var imagePath = Path.Combine(filePath, report.ImageName);
                         if (System.IO.File.Exists(imagePath))
                         {
                             using (var imageStream = new FileStream(imagePath, FileMode.Open, FileAccess.Read))
+                            using (var image = System.Drawing.Image.FromStream(imageStream))
                             {
+                                int targetWidth = 80;
+                                int targetHeight = 80;
+
+                                double ratioX = (double)targetWidth / image.Width;
+                                double ratioY = (double)targetHeight / image.Height;
+                                double ratio = Math.Min(ratioX, ratioY);
+
+                                int finalWidth = (int)(image.Width * ratio);
+                                int finalHeight = (int)(image.Height * ratio);
+
+                                double excelColWidth = targetWidth / 7.5;
+                                worksheet.Column(3).Width = excelColWidth;
+
+                                worksheet.Row(row).Height = finalHeight * 0.75;
+
+                                imageStream.Position = 0;
+
                                 var excelImage = worksheet.Drawings.AddPicture($"img_{row}", imageStream);
-
-                                // Anchor to the cell C{row}
-                                excelImage.SetPosition(row - 1, 5, 2, 5); // (rowIndex, offsetY, colIndex, offsetX)
-                                excelImage.SetSize(80, 80);
-                                excelImage.EditAs = eEditAs.OneCell; // Anchor image to cell
-
-                                // Lock image and maintain aspect ratio
+                                excelImage.SetSize(finalWidth, finalHeight);
+                                excelImage.SetPosition(row - 1, 0, 2, 0);
+                                excelImage.EditAs = eEditAs.OneCell;
                                 excelImage.Locked = true;
                                 excelImage.LockAspectRatio = true;
-
-                                // Adjust row height and column width to fit image
-                                worksheet.Row(row).Height = 60;
-                                worksheet.Column(3).Width = (80 - 5) / 7.0; // Approx 10.7 for image to show well
                             }
                         }
+                    }
+                    else
+                    {
+                        // No image: set default row height (optional)
+                        worksheet.Row(row).Height = 15;
                     }
 
                     row++;
                 }
 
-                // Formatting headers and columns
-                worksheet.Column(1).Width = 30;
-                worksheet.Column(2).Width = 50;
-                worksheet.Row(1).Style.Font.Bold = true;
+                // Borders
+                using (var range = worksheet.Cells[3, 1, row - 1, 3])
+                {
+                    range.Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                    range.Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                    range.Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                    range.Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
 
-                // Add auto filter
-                worksheet.Cells["A1:B1"].AutoFilter = true;
+                    var thick = OfficeOpenXml.Style.ExcelBorderStyle.Medium;
+                    worksheet.Cells["A1:C3"].Style.Border.Top.Style = thick;
+                    worksheet.Cells["A1:C3"].Style.Border.Bottom.Style = thick;
+                    worksheet.Cells["A1:C3"].Style.Border.Left.Style = thick;
+                    worksheet.Cells["A1:C3"].Style.Border.Right.Style = thick;
 
-                // Lock all cells
+                    worksheet.Cells[3, 1, row - 1, 3].Style.Border.Top.Style = thick;
+                    worksheet.Cells[3, 1, row - 1, 3].Style.Border.Bottom.Style = thick;
+                    worksheet.Cells[3, 1, row - 1, 3].Style.Border.Left.Style = thick;
+                    worksheet.Cells[3, 1, row - 1, 3].Style.Border.Right.Style = thick;
+                }
+
+                // AutoFilter
+                worksheet.Cells["A3:C3"].AutoFilter = true;
+
+                // Lock and protect worksheet
                 worksheet.Cells.Style.Locked = true;
-
-                // Protect worksheet - disable image editing
-                worksheet.Protection.SetPassword("YourPassword"); // Change this
+                worksheet.Protection.SetPassword("YourPassword");
                 worksheet.Protection.AllowSelectLockedCells = true;
                 worksheet.Protection.AllowSelectUnlockedCells = true;
                 worksheet.Protection.AllowAutoFilter = true;
@@ -191,12 +254,10 @@ namespace MVCTemplate.Controllers
                 worksheet.Protection.AllowEditScenarios = false;
                 worksheet.Protection.IsProtected = true;
 
-                // Protect workbook structure
                 package.Workbook.Protection.SetPassword("YourPassword");
                 package.Workbook.Protection.LockStructure = true;
                 package.Workbook.Protection.LockWindows = true;
 
-                // Save and return the Excel file
                 var stream = new MemoryStream();
                 package.SaveAs(stream);
                 stream.Position = 0;
@@ -205,6 +266,10 @@ namespace MVCTemplate.Controllers
                 return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
             }
         }
+
+
+
+
 
         [HttpGet]
         public async Task<IActionResult> ExportFilteredToExcel(string? titleFilter)
