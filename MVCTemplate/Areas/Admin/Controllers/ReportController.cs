@@ -576,34 +576,38 @@ namespace MVCTemplate.Controllers
                             foreach (var report in reports)
                             {
                                 // Title cell
-                                table.Cell().Element(cell => CellStyle(cell).Text(report.Title ?? ""));
+                                table.Cell().Element(CellStyle).Element(cell =>
+                                    cell.MinimalBox().ShowOnce().Text(report.Title ?? "")
+                                );
 
                                 // Description cell
-                                table.Cell().Element(cell => CellStyle(cell).Text(report.Description ?? ""));
+                                table.Cell().Element(CellStyle).Element(cell =>
+                                    cell.MinimalBox().ShowOnce().Text(report.Description ?? "")
+                                );
 
-                                // Image cell: no nested Element calls, build content inline
-                                table.Cell().Element(cell =>
+                                // Image cell
+                                table.Cell().Element(CellStyle).Element(cell =>
                                 {
-                                    var styledCell = CellStyle(cell);
-
                                     if (!string.IsNullOrEmpty(report.ImageName))
                                     {
                                         var imagePath = Path.Combine(filePath, report.ImageName);
                                         if (System.IO.File.Exists(imagePath))
                                         {
-                                            styledCell.Image(imagePath, ImageScaling.FitArea);
+                                            cell.MinimalBox()
+                                                .ShowOnce()
+                                                .Image(imagePath, ImageScaling.FitWidth);
                                         }
                                         else
                                         {
-                                            styledCell.Text("[Image not found]");
+                                            cell.Text("[Image not found]");
                                         }
                                     }
                                     else
                                     {
-                                        styledCell.Text("[No image]");
+                                        cell.Text("[No image]");
                                     }
 
-                                    return styledCell;
+                                    return cell;
                                 });
                             }
                         });
@@ -624,6 +628,7 @@ namespace MVCTemplate.Controllers
                     .AlignCenter();
             }
         }
+
 
 
 
