@@ -463,8 +463,6 @@ namespace MVCTemplate.Controllers
             }
         }
 
-
-
         [HttpGet]
         public async Task<IActionResult> ExportFilteredToPdf(string? titleFilter, string? descriptionFilter)
         {
@@ -473,16 +471,12 @@ namespace MVCTemplate.Controllers
             var reportsQuery = _context.Reports.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(titleFilter))
-            {
                 reportsQuery = reportsQuery.Where(r => r.Title != null && r.Title.Contains(titleFilter));
-            }
+
             if (!string.IsNullOrWhiteSpace(descriptionFilter))
-            {
                 reportsQuery = reportsQuery.Where(r => r.Description != null && r.Description.Contains(descriptionFilter));
-            }
 
             var reports = await reportsQuery.ToListAsync();
-
             var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads/reports");
 
             byte[] pdfBytes = Document.Create(container =>
@@ -492,6 +486,17 @@ namespace MVCTemplate.Controllers
                     page.Margin(20);
                     page.Size(PageSizes.A4);
 
+                    // Header with page number
+                    page.Header()
+                        .AlignRight()
+                        .Text(text =>
+                        {
+                            text.Span("Page ").FontSize(10).FontColor(Colors.Grey.Medium);
+                            text.CurrentPageNumber().FontSize(10).FontColor(Colors.Grey.Medium);
+                            text.Span(" of ").FontSize(10).FontColor(Colors.Grey.Medium);
+                            text.TotalPages().FontSize(10).FontColor(Colors.Grey.Medium);
+                        });
+
                     // Footer with generation date
                     page.Footer()
                         .AlignRight()
@@ -499,58 +504,112 @@ namespace MVCTemplate.Controllers
                         .FontSize(10)
                         .FontColor(Colors.Grey.Medium);
 
-                    page.Content().Table(table =>
+                    // Page content
+                    page.Content().Column(column =>
                     {
-                        table.ColumnsDefinition(columns =>
-                        {
-                            columns.RelativeColumn(3);
-                            columns.RelativeColumn(5);
-                            columns.RelativeColumn(3);
-                        });
+                        // Table title
+                        column.Item()
+                            .PaddingBottom(5)
+                            .AlignCenter()
+                            .Text("Filtered Reports Data")
+                            .FontSize(16)
+                            .Bold()
+                            .Underline();
 
-                        table.Header(header =>
-                        {
-                            header.Cell().Element(CellStyle).Text("Title").Bold();
-                            header.Cell().Element(CellStyle).Text("Description").Bold();
-                            header.Cell().Element(CellStyle).Text("Image").Bold();
-                        });
-
-                        foreach (var report in reports)
-                        {
-                            table.Cell().Element(CellStyle).Text(report.Title ?? "");
-                            table.Cell().Element(CellStyle).Text(report.Description ?? "");
-
-                            if (!string.IsNullOrEmpty(report.ImageName))
+                        // Filter description
+                        column.Item()
+                            .PaddingBottom(10)
+                            .Text(text =>
                             {
-                                var imagePath = Path.Combine(filePath, report.ImageName);
-                                if (System.IO.File.Exists(imagePath))
-                                {
-                                    table.Cell().Element(CellStyle).Image(imagePath, ImageScaling.FitArea);
-                                }
+                                if (!string.IsNullOrWhiteSpace(titleFilter) && !string.IsNullOrWhiteSpace(descriptionFilter))
+                                    text.Span($"Filter - Title: \"{titleFilter}\", Description: \"{descriptionFilter}\"")
+                                        .FontSize(12)
+                                        .FontColor(Colors.Grey.Darken2);
+                                else if (!string.IsNullOrWhiteSpace(titleFilter))
+                                    text.Span($"Filter - Title: \"{titleFilter}\"")
+                                        .FontSize(12)
+                                        .FontColor(Colors.Grey.Darken2);
+                                else if (!string.IsNullOrWhiteSpace(descriptionFilter))
+                                    text.Span($"Filter - Description: \"{descriptionFilter}\"")
+                                        .FontSize(12)
+                                        .FontColor(Colors.Grey.Darken2);
                                 else
-                                {
-                                    table.Cell().Element(CellStyle).Text("[Image not found]");
-                                }
-                            }
-                            else
+                                    text.Span("No filters applied.")
+                                        .FontSize(12)
+                                        .FontColor(Colors.Grey.Darken2);
+                            });
+
+                        // Reports Table
+                        column.Item().Table(table =>
+                        {
+                            table.ColumnsDefinition(columns =>
                             {
-                                table.Cell().Element(CellStyle).Text("[No image]");
+                                columns.RelativeColumn(3);
+                                columns.RelativeColumn(5);
+                                columns.RelativeColumn(3);
+                            });
+
+                            // Table header
+                            table.Header(header =>
+                            {
+                                header.Cell().Element(CellStyle).Text("Title").Bold();
+                                header.Cell().Element(CellStyle).Text("Description").Bold();
+                                header.Cell().Element(CellStyle).Text("Image").Bold();
+                            });
+
+                            // Data rows
+                            foreach (var report in reports)
+                            {
+                                // Title cell
+                                table.Cell().Element(cell => CellStyle(cell).Text(report.Title ?? ""));
+
+                                // Description cell
+                                table.Cell().Element(cell => CellStyle(cell).Text(report.Description ?? ""));
+
+                                // Image cell: no nested Element calls, build content inline
+                                table.Cell().Element(cell =>
+                                {
+                                    var styledCell = CellStyle(cell);
+
+                                    if (!string.IsNullOrEmpty(report.ImageName))
+                                    {
+                                        var imagePath = Path.Combine(filePath, report.ImageName);
+                                        if (System.IO.File.Exists(imagePath))
+                                        {
+                                            styledCell.Image(imagePath, ImageScaling.FitArea);
+                                        }
+                                        else
+                                        {
+                                            styledCell.Text("[Image not found]");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        styledCell.Text("[No image]");
+                                    }
+
+                                    return styledCell;
+                                });
                             }
-                        }
+                        });
                     });
                 });
             }).GeneratePdf();
 
             return File(pdfBytes, "application/pdf", "FilteredReports.pdf");
 
-            IContainer CellStyle(IContainer container) =>
-                container
+            // Helper to style cells
+            IContainer CellStyle(IContainer container)
+            {
+                return container
                     .Border(1)
                     .BorderColor(Colors.Grey.Medium)
                     .Padding(5)
                     .AlignMiddle()
                     .AlignCenter();
+            }
         }
+
 
 
         // GET: /Report/Index
