@@ -14,6 +14,22 @@
             $('.report-thumbnail.enlarged').removeClass('enlarged');
         }
     });
+
+    // Add export filtered PDF button event handler
+    $('#exportFilteredPdfBtn').on('click', function () {
+        // Get current DataTable search filter value
+        var table = $('#reportTable').DataTable();
+        var searchValue = table.search().trim();
+
+        // Build URL with filter query param if exists
+        var url = '/Admin/Report/ExportFilteredToPdf';
+        if (searchValue) {
+            url += '?titleFilter=' + encodeURIComponent(searchValue);
+        }
+
+        // Open the export URL in a new tab/window to trigger download
+        window.open(url, '_blank');
+    });
 });
 
 function loadDataTableReport() {
@@ -30,7 +46,7 @@ function loadDataTableReport() {
                 autoWidth: true,
                 render: function (data, type, full, meta) {
                     if (data) {
-                        return `<img src="/uploads/reports/${data}" alt="${full.title}" class="report-thumbnail" />`; // was Uploads/reports before
+                        return `<img src="/uploads/reports/${data}" alt="${full.title}" class="report-thumbnail" />`;
                     } else {
                         return 'No Image';
                     }

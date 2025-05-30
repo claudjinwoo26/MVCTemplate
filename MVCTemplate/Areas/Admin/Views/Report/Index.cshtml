@@ -20,12 +20,29 @@
                     <button type="button" class="btn-shadow btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
                         + Add Report
                     </button>
+
+                    <a asp-action="ExportToExcel" class="btn btn-success">
+                        <i class="fa-regular fa-file-excel" style="color: #ffffff;"></i>
+                        Export
+                    </a>
+
+                    <a asp-action="ExportToPdf" class="btn btn-danger ms-2">Export to PDF</a>
+
+                    <button id="exportFilteredPdfBtn" class="btn btn-danger ms-2">Export Filtered PDF</button>
                 </div>
-
-                <a asp-action="ExportToExcel" class="btn btn-success">Export to Excel</a>
-
-                <a asp-action="ExportToPdf" class="btn btn-danger ms-2">Export to PDF</a>
             </div>
+        </div>
+    </div>
+
+    <!-- Search Filters -->
+    <div class="mb-3 row">
+        <div class="col-md-4">
+            <label for="titleSearch" class="form-label">Search by Title:</label>
+            <input type="text" id="titleSearch" class="form-control" placeholder="Report title..." />
+        </div>
+        <div class="col-md-4">
+            <label for="descriptionSearch" class="form-label">Search by Description:</label>
+            <input type="text" id="descriptionSearch" class="form-control" placeholder="Report description..." />
         </div>
     </div>
 
@@ -43,7 +60,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @* Initially empty, will be filled by AJAX *@
+                        @* Filled via DataTable Ajax *@
                     </tbody>
                 </table>
             </div>
@@ -135,6 +152,28 @@
 @section Scripts {
     <script src="~/js/validation.js"></script>
     <script src="~/js/formSubmissionAjax.js"></script>
-    <script src="~/js/ReportScripts/report-data-table.js"></script>
     <script src="~/js/deleteGeneralSettings.js"></script>
+    <script src="~/js/ReportScripts/report-data-table.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Filtering by external inputs
+            $('#titleSearch').on('keyup change', function () {
+                $('#reportTable').DataTable().column(0).search(this.value).draw();
+            });
+
+            $('#descriptionSearch').on('keyup change', function () {
+                $('#reportTable').DataTable().column(2).search(this.value).draw();
+            });
+
+            $('#exportFilteredPdfBtn').on('click', function () {
+                const table = $('#reportTable').DataTable();
+                const titleFilter = table.column(0).search() || '';
+                const descriptionFilter = table.column(2).search() || '';
+
+                const url = `/Admin/Report/ExportFilteredToPdf?titleFilter=${encodeURIComponent(titleFilter)}&descriptionFilter=${encodeURIComponent(descriptionFilter)}`;
+                window.open(url, '_blank');
+            });
+        });
+    </script>
 }

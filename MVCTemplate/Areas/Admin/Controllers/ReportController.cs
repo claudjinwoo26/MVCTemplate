@@ -52,6 +52,14 @@ namespace MVCTemplate.Controllers
                     page.Margin(20);
                     page.Size(PageSizes.A4);
 
+                    // Add footer with report generation date
+                    page.Footer()
+                        .AlignRight()
+                        .Text($"Report generated on {DateTime.Now:MM-dd-yyyy}")
+                        .FontSize(10)
+                        .FontColor(Colors.Grey.Medium);
+
+
                     page.Content().Table(table =>
                     {
                         // Define columns count and relative widths
@@ -110,8 +118,10 @@ namespace MVCTemplate.Controllers
         }
 
 
+
+
         [HttpGet]
-        public async Task<IActionResult> ExportToExcel()
+        public async Task<IActionResult> ExportToExcel() // all data are fetched
         {
             ExcelPackage.License.SetNonCommercialPersonal("My Name");
 
@@ -194,6 +204,89 @@ namespace MVCTemplate.Controllers
                 string fileName = $"Reports.xlsx";
                 return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ExportFilteredToPdf(string? titleFilter) // not all
+        {
+            QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+
+            var reportsQuery = _context.Reports.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(titleFilter))
+            {
+                reportsQuery = reportsQuery.Where(r => r.Title != null && r.Title.Contains(titleFilter));
+            }
+
+            var reports = await reportsQuery.ToListAsync();
+
+            var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads/reports");
+
+            byte[] pdfBytes = Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Margin(20);
+                    page.Size(PageSizes.A4);
+
+                    // Footer with generation date
+                    page.Footer()
+                        .AlignRight()
+                        .Text($"Report generated on {DateTime.Now:MM-dd-yyyy}")
+                        .FontSize(10)
+                        .FontColor(Colors.Grey.Medium);
+
+                    page.Content().Table(table =>
+                    {
+                        table.ColumnsDefinition(columns =>
+                        {
+                            columns.RelativeColumn(3);
+                            columns.RelativeColumn(5);
+                            columns.RelativeColumn(3);
+                        });
+
+                        table.Header(header =>
+                        {
+                            header.Cell().Element(CellStyle).Text("Title").Bold();
+                            header.Cell().Element(CellStyle).Text("Description").Bold();
+                            header.Cell().Element(CellStyle).Text("Image").Bold();
+                        });
+
+                        foreach (var report in reports)
+                        {
+                            table.Cell().Element(CellStyle).Text(report.Title ?? "");
+                            table.Cell().Element(CellStyle).Text(report.Description ?? "");
+
+                            if (!string.IsNullOrEmpty(report.ImageName))
+                            {
+                                var imagePath = Path.Combine(filePath, report.ImageName);
+                                if (System.IO.File.Exists(imagePath))
+                                {
+                                    table.Cell().Element(CellStyle).Image(imagePath, ImageScaling.FitArea);
+                                }
+                                else
+                                {
+                                    table.Cell().Element(CellStyle).Text("[Image not found]");
+                                }
+                            }
+                            else
+                            {
+                                table.Cell().Element(CellStyle).Text("[No image]");
+                            }
+                        }
+                    });
+                });
+            }).GeneratePdf();
+
+            return File(pdfBytes, "application/pdf", "FilteredReports.pdf");
+
+            IContainer CellStyle(IContainer container) =>
+                container
+                    .Border(1)
+                    .BorderColor(Colors.Grey.Medium)
+                    .Padding(5)
+                    .AlignMiddle()
+                    .AlignCenter();
         }
 
 
