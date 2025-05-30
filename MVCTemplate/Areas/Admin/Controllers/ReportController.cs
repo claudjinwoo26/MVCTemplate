@@ -66,7 +66,7 @@ namespace MVCTemplate.Controllers
                     // Footer with report generation date
                     page.Footer()
                         .AlignRight()
-                        .Text($"Report generated on {DateTime.Now:MM-dd-yyyy}")
+                        .Text($"Report generated on {DateTime.Now:MM-dd-yyyy hh:mm tt}")
                         .FontSize(10)
                         .FontColor(Colors.Grey.Medium);
 
@@ -515,7 +515,7 @@ namespace MVCTemplate.Controllers
                     // Footer with generation date
                     page.Footer()
                         .AlignRight()
-                        .Text($"Report generated on {DateTime.Now:MM-dd-yyyy}")
+                        .Text($"Report generated on {DateTime.Now:MM-dd-yyyy hh:mm tt}")
                         .FontSize(10)
                         .FontColor(Colors.Grey.Medium);
 
