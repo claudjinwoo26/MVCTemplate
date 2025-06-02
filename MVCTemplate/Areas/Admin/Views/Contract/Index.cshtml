@@ -1,0 +1,279 @@
+﻿@model ContractVM
+@{
+    ViewData["Title"] = "Contract";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="app-main__inner">
+    <div class="app-page-title">
+        <div class="page-title-wrapper">
+            <div class="page-title-heading">
+                <div class="page-title-icon">
+                    <i class="lnr-bookmark icon-gradient bg-premium-dark"></i>
+                </div>
+                <div>
+                    <span class="text-primary"><b>Contracts</b></span>
+                </div>
+            </div>
+            <div class="page-title-actions">
+                <div class="d-inline-block dropdown">
+                    <button id="button-excel" class="btn btn-success">
+                        <i class="fa-regular fa-file-excel" style="color: #ffffff;"></i>
+                        Export
+                    </button>
+
+                    <button type="button" class="btn-shadow btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
+                        + Add product
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart Controls -->
+    <div class="row mb-3">
+        <div class="col-2">
+            <label><b>Chart-Type</b></label>
+            <select id="ChartType" class="form-control">
+                <option selected>--Select Chart Type--</option>
+                <option value="bar">Bar</option>
+                <option value="line">Line</option>
+                <option value="pie">Pie</option>
+                <option value="doughnut">Doughnut</option>
+            </select>
+        </div>
+        <div class="col-auto align-self-end">
+            <button id="ShowGraphBtn" class="btn btn-primary">Show Graph</button>
+            <button id="RemoveGraphBtn" class="btn btn-danger">Remove Graph</button>
+        </div>
+    </div>
+
+    <!-- Chart Container (hidden by default) -->
+    <div id="ChartView" style="display: none;">
+        <canvas id="myChart" style="max-width:750px; max-height:400px;"></canvas>
+    </div>
+
+    <!-- Product Table -->
+    <div class="main-card mb-3 card">
+        <div class="card-body">
+
+            <div class="mb-3 row">
+                <div class="col-md-4">
+                    <label for="nameSearch" class="form-label">Search by Name:</label>
+                    <input type="text" id="nameSearch" class="form-control" placeholder="Package name..." />
+                </div>
+                <div class="col-md-4">
+                    <label for="descriptionSearch" class="form-label">Search by Description:</label>
+                    <input type="text" id="descriptionSearch" class="form-control" placeholder="Package description..." />
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <div class="col-md-4">
+                    <label for="minQuantity" class="form-label">Min Quantity:</label>
+                    <input type="number" id="minQuantity" class="form-control" placeholder="Min quantity..." />
+                </div>
+                <div class="col-md-4">
+                    <label for="maxQuantity" class="form-label">Max Quantity:</label>
+                    <input type="number" id="maxQuantity" class="form-control" placeholder="Max quantity..." />
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table style="width: 100%;" id="contractTable" class="table table-hover table-striped table-bordered display nowrap">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Validity</th>
+                            <th>Person ID</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Modal {
+    <!-- Create Modal -->
+    <div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Contract</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form asp-action="Create" asp-controller="Contract" method="post" id="createForm">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label asp-for="Contract.Name">Contract Name<span class="text-danger">*</span></label>
+                            <input asp-for="Contract.Name" class="form-control" />
+                            <span asp-validation-for="Contract.Name" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Contract.Description">Contract Description</label>
+                            <input asp-for="Contract.Description" class="form-control" />
+                            <span asp-validation-for="Contract.Description" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Contract.Validity">Contract Validity (MM/dd/yyyy)<span class="text-danger">*</span></label>
+                            <input asp-for="Contract.Validity" type="date" class="form-control" />
+                            <span asp-validation-for="Contract.Validity" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Contract.PersonId">Select Person<span class="text-danger">*</span></label>
+                            <select asp-for="Contract.PersonId" class="form-control" asp-items="Model.PersonList">
+                                <option value="">-- Select Person --</option>
+                            </select>
+                            <span asp-validation-for="Contract.PersonId" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button id="createAddFormSubmitBtn" type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+    @* Update Modal *@
+    <div class="modal fade" id="updateModal" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Update Contract</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form asp-action="Update" asp-controller="Contract" method="post" id="updateForm">
+                    <div class="modal-body">
+                        <input type="hidden" asp-for="Contract.Id" />
+
+                        <div class="form-group">
+                            <label asp-for="Contract.Name" class="control-label">Contract Name<span class="text-danger">*</span></label>
+                            <input asp-for="Contract.Name" class="form-control" />
+                            <span asp-validation-for="Contract.Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Contract.Description" class="control-label">Contract Description</label>
+                            <input asp-for="Contract.Description" class="form-control" />
+                            <span asp-validation-for="Contract.Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Contract.Validity">Contract Validity (MM/dd/yyyy)<span class="text-danger">*</span></label>
+                            <input asp-for="Contract.Validity" type="date" class="form-control" />
+                            <span asp-validation-for="Contract.Validity" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Contract.PersonId" class="control-label">Select Person<span class="text-danger">*</span></label>
+                            <select asp-for="Contract.PersonId" class="form-control" asp-items="Model.PersonList">
+                                <option value="">-- Select Person --</option>
+                            </select>
+                            <span asp-validation-for="Contract.PersonId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn-shadow btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" id="createEditFormSubmitBtn" class="ladda-button me-2 btn-shadow btn btn-primary" data-style="expand-left">
+                            <span class="ladda-label">Save Changes</span>
+                            <span class="ladda-spinner"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/js/validation.js"></script>
+    <script src="~/js/formSubmissionAjax.js"></script>
+    <script src="~/js/ContractScripts/contract-data-table.js"></script>
+    <script src="~/js/deleteGeneralSettings.js"></script>
+    <script src="~/js/ContractScripts/contract-export.js"></script>
+
+    <script>
+        $(function () {
+            $("#ShowGraphBtn").click(function () {
+                var chartType = $("#ChartType").val();
+                if (chartType === "--Select Chart Type--") {
+                    alert("Please select a chart type.");
+                    return;
+                }
+
+                $("#ChartView").show().html('<canvas id="myChart" style="max-width:750px; max-height:400px;"></canvas>');
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Admin/Contracts/GetContractsData",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        var _chartLabels = data[0];
+                        var _chartData = data[1];
+
+                        var barColors = ["#007bff", "#28a745", "#dc3545", "#ffc107", "#17a2b8", "#6c757d", "#fd7e14", "#20c997"];
+
+                        new Chart(document.getElementById("myChart"), {
+                            type: chartType,
+                            data: {
+                                labels: _chartLabels,
+                                datasets: [{
+                                    label: 'Product Quantities',
+                                    backgroundColor: barColors,
+                                    data: _chartData
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: {
+                                    title: {
+                                        display: true,
+                                        text: 'Product Quantities by Name'
+                                    },
+                                    legend: {
+                                        display: chartType === 'pie' || chartType === 'doughnut'
+                                    }
+                                },
+                                scales: (chartType === 'bar' || chartType === 'line') ? {
+                                    x: {
+                                        title: {
+                                            display: true,
+                                            text: 'Product Name'
+                                        }
+                                    },
+                                    y: {
+                                        beginAtZero: true,
+                                        title: {
+                                            display: true,
+                                            text: 'Quantity'
+                                        }
+                                    }
+                                } : {}
+                            }
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error fetching chart data:", error);
+                    }
+                });
+            });
+
+            $("#RemoveGraphBtn").click(function () {
+                $("#ChartView").hide().html('');
+            });
+        });
+    </script>
+}

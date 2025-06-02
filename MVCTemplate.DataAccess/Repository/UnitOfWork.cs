@@ -13,6 +13,7 @@ namespace MVCTemplate.DataAccess.Repository
         public IPersonRepository Person { get; private set; }
         public IPackageRepository Package { get; private set; }
         public IReportRepository Report { get; private set; }
+        public IContractRepository Contract { get; private set; }
 
         public UnitOfWork(ApplicationDbContext db)
         {
@@ -22,6 +23,7 @@ namespace MVCTemplate.DataAccess.Repository
             Person = new PersonRepository(_db);
             Package = new PackageRepository(_db);
             Report = new ReportRepository(_db);
+            Contract = new ContractRepository(_db);
         }
 
         public void Save()

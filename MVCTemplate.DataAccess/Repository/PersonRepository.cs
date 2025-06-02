@@ -11,13 +11,18 @@ using System.Threading.Tasks;
 
 namespace MVCTemplate.DataAccess.Repository
 {
-    public class PersonRepository : Repository<Category>, IPersonRepository
+    public class PersonRepository : Repository<Person>, IPersonRepository
     {
         private readonly ApplicationDbContext _db;
 
         public PersonRepository(ApplicationDbContext db) : base(db) 
         {
             _db = db;
+        }
+
+        public bool Exists(int id)
+        {
+            return _db.Persons.Any(p => p.Id == id);
         }
 
         public void Add(Person person) // for the app person

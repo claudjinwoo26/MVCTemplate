@@ -6,14 +6,15 @@ namespace MVCTemplate.DataAccess.Repository.IRepository
 {
     public interface IPersonRepository : IRepository<Person>
     {
-        void Update(Person category);
+        void Update(Person person);
 
-        void Remove(Person category);
+        void Remove(Person person);
 
         Person? CheckIfUnique(string name);
 
         Person? ContinueIfNoChangeOnUpdate(string name, int Id);
 
-        Person GetFirstOrDefault(Expression<Func<Category, bool>> predicate);
+        Person GetFirstOrDefault(Expression<Func<Person, bool>> predicate);
+        bool Exists(int id);
     }
 }

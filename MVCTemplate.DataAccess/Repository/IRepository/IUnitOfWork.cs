@@ -8,5 +8,6 @@ public interface IUnitOfWork
     IPersonRepository Person { get; }
     IPackageRepository Package { get; }
     IReportRepository Report { get; }
+    IContractRepository Contract { get; }
     void Save();
 }
