@@ -243,10 +243,15 @@ namespace MVCTemplate.Controllers
 
                 if (picturesByRow.TryGetValue(rowIndex, out var picData))
                 {
-                    var fileName = $"{Guid.NewGuid()}.{picData.Extension}";
+                    var hash = ComputeHash(picData.Data);
+                    var fileName = $"{hash}.{picData.Extension}";
                     var filePath = Path.Combine(uploadFolder, fileName);
 
-                    await System.IO.File.WriteAllBytesAsync(filePath, picData.Data);
+                    if (!System.IO.File.Exists(filePath))
+                    {
+                        await System.IO.File.WriteAllBytesAsync(filePath, picData.Data);
+                    }
+
                     savedFileName = fileName;
                 }
 
@@ -283,6 +288,14 @@ namespace MVCTemplate.Controllers
             TempData["Success"] = "Reports imported successfully.";
             return RedirectToAction("Index");
         }
+
+        private string ComputeHash(byte[] data)
+        {
+            using var sha256 = System.Security.Cryptography.SHA256.Create();
+            var hashBytes = sha256.ComputeHash(data);
+            return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
+        }
+
 
 
 
