@@ -154,7 +154,7 @@ namespace MVCTemplate.Areas.Admin.Controllers
             try
             {
                 obj.GenerateUpdatedAt();
-                var contract = _unitOfWork.Contract.ContinueIfNoChangeOnUpdate(obj.Name, obj.Id);
+                Contract? contract = _unitOfWork.Contract.ContinueIfNoChangeOnUpdate(obj.Name, obj.Id);
 
                 if (contract != null)
                 {

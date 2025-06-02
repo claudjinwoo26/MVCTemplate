@@ -1,20 +1,29 @@
+// Date range filter using DataTables custom filter extension
+$.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+    let min = $('#startDate').val();
+    let max = $('#endDate').val();
+    let dateStr = data[2]; // "createdAt" is column index 3
 
-// Custom filter to handle min/max quantity filtering
-$.fn.dataTable.ext.search.push(
-    function (settings, data, dataIndex) {
-        var min = parseInt($('#minQuantity').val(), 10);
-        var max = parseInt($('#maxQuantity').val(), 10);
-        var quantity = parseInt(data[2]) || 0;
+    if (!dateStr) return false;
 
-        if ((isNaN(min) && isNaN(max)) ||
-            (isNaN(min) && quantity <= max) ||
-            (min <= quantity && isNaN(max)) ||
-            (min <= quantity && quantity <= max)) {
-            return true;
-        }
-        return false;
+    let createdDate = new Date(dateStr);
+    createdDate.setHours(0, 0, 0, 0); // Normalize time to 00:00 for consistency
+
+    let minDate = min ? new Date(min) : null;
+    let maxDate = max ? new Date(max) : null;
+
+    if (minDate) minDate.setHours(0, 0, 0, 0);
+    if (maxDate) maxDate.setHours(23, 59, 59, 999); // Include full end date
+
+    if (
+        (!minDate || createdDate >= minDate) &&
+        (!maxDate || createdDate <= maxDate)
+    ) {
+        return true;
     }
-);
+
+    return false;
+});
 
 $(document).ready(function () {
     loadDataTable();
@@ -62,12 +71,9 @@ $('#descriptionSearch').on('keyup change', function () {
     dataTable.column(1).search(this.value).draw();
 });
 
-// New event handler for min and max quantity filtering
-$('#minQuantity, #maxQuantity').on('keyup change', function () {
+$('#startDate, #endDate').on('change', function () {
     dataTable.draw();
 });
-
-// Call loadDataTable() to initialize your DataTable when the page loads
 
 $('#updateModal').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget);
@@ -75,14 +81,13 @@ $('#updateModal').on('show.bs.modal', function (event) {
     var name = button.data('name');
     var description = button.data('description');
     var validity = button.data('validity');
-    var personId = button.data('personid');
+    var personId = button.data('personId');
     var modal = $(this);
 
-    modal.find('.modal-body #id').val(id);
-    modal.find('.modal-body #name').val(name);
-    modal.find('.modal-body #description').val(description);
-    modal.find('.modal-body #validity').val(validity);
-    modal.find('.modal-body #PersonId').val(personId).trigger('change');
-
+    modal.find('#Contract_Id').val(id);
+    modal.find('#Contract_Name').val(name);
+    modal.find('#Contract_Description').val(description);
+    modal.find('#Contract_Validity').val(validity);
+    modal.find('#Contract_PersonId').val(personId).trigger('change');
 });
 
