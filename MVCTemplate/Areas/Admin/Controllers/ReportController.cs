@@ -20,7 +20,13 @@ using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using QuestPDF.Drawing;
 using QuestPDF.Elements;
-using QuestPDF.Previewer;
+using QuestPDF.Previewer; // for export pdf
+using NPOI.XSSF.UserModel;
+using NPOI.SS.UserModel;
+using NPOI.SS.Util;
+using NPOI.OpenXml4Net.OPC;
+using NPOI.XSSF.UserModel.Helpers;
+using System.Drawing.Imaging; // for import excel
 
 namespace MVCTemplate.Controllers
 {
@@ -154,6 +160,130 @@ namespace MVCTemplate.Controllers
                     .AlignMiddle()
                     .AlignCenter();
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ImportExcel(IFormFile excelFile)
+        {
+            Console.WriteLine($"ImportExcel started at {DateTime.Now}");
+
+            if (excelFile == null || excelFile.Length == 0)
+            {
+                ModelState.AddModelError("", "Please select a valid Excel file.");
+                return RedirectToAction("Index");
+            }
+
+            var uploadFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", "reports");
+            if (!Directory.Exists(uploadFolder))
+                Directory.CreateDirectory(uploadFolder);
+
+            using var stream = excelFile.OpenReadStream();
+            IWorkbook workbook = null;
+
+            try
+            {
+                var extension = Path.GetExtension(excelFile.FileName).ToLower();
+                if (extension == ".xls")
+                    workbook = new NPOI.HSSF.UserModel.HSSFWorkbook(stream);
+                else if (extension == ".xlsx")
+                    workbook = new XSSFWorkbook(stream);
+                else
+                    throw new Exception("Invalid file format");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Error reading Excel file: " + ex.Message);
+                return RedirectToAction("Index");
+            }
+
+            var sheet = workbook.GetSheetAt(0);
+
+            var drawing = sheet.CreateDrawingPatriarch() as XSSFDrawing;
+            var shapes = drawing?.GetShapes();
+
+            var picturesByRow = new Dictionary<int, (byte[] Data, string Extension)>();
+
+            if (shapes != null)
+            {
+                foreach (var shape in shapes)
+                {
+                    if (shape is XSSFPicture pic)
+                    {
+                        var anchor = pic.ClientAnchor as XSSFClientAnchor;
+                        if (anchor == null)
+                            continue;
+
+                        int row1 = anchor.Row1;
+
+                        var pictureData = pic.PictureData;
+                        var data = pictureData.Data;
+                        var ext = pictureData.SuggestFileExtension();
+
+                        picturesByRow[row1] = (data, ext);
+                    }
+                }
+            }
+
+            for (int rowIndex = 1; rowIndex <= sheet.LastRowNum; rowIndex++)
+            {
+                var row = sheet.GetRow(rowIndex);
+                if (row == null) continue;
+
+                var titleCell = row.GetCell(0);
+                string title = titleCell?.ToString().Trim() ?? string.Empty;
+
+                var descCell = row.GetCell(2);
+                string description = descCell?.ToString().Trim() ?? string.Empty;
+
+                if (string.IsNullOrEmpty(title)) continue;
+
+                Console.WriteLine($"Processing row {rowIndex} - Title: {title}");
+
+                string savedFileName = null;
+
+                if (picturesByRow.TryGetValue(rowIndex, out var picData))
+                {
+                    var fileName = $"{Guid.NewGuid()}.{picData.Extension}";
+                    var filePath = Path.Combine(uploadFolder, fileName);
+
+                    await System.IO.File.WriteAllBytesAsync(filePath, picData.Data);
+                    savedFileName = fileName;
+                }
+
+                if (string.IsNullOrEmpty(savedFileName))
+                {
+                    // Skip rows without image (or handle differently if image is optional)
+                    continue;
+                }
+
+                // Check if report with same Title and ImageName already exists
+                var existingReport = await _context.Reports
+                    .FirstOrDefaultAsync(r => r.Title == title && r.ImageName == savedFileName);
+
+                if (existingReport == null)
+                {
+                    var report = new Report
+                    {
+                        Title = title,
+                        Description = description,
+                        ImageName = savedFileName,
+                        CreatedAt = DateTime.Now
+                    };
+
+                    _context.Reports.Add(report);
+                }
+                else
+                {
+                    Console.WriteLine($"Duplicate skipped: Title={title}, Image={savedFileName}");
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Reports imported successfully.";
+            return RedirectToAction("Index");
+        }
+
 
 
 

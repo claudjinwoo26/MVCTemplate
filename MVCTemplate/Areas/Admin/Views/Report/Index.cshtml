@@ -33,6 +33,11 @@
                     <button id="exportFilteredExcelBtn" class="btn btn-success ms-2">
                         Export Filtered Excel
                     </button>
+
+                    <!-- New Import Excel Button -->
+                    <button type="button" class="btn btn-info ms-2" data-bs-toggle="modal" data-bs-target="#importModal">
+                        <i class="fa fa-file-import"></i> Import Excel
+                    </button>
                 </div>
             </div>
         </div>
@@ -146,6 +151,30 @@
                             <span class="ladda-label">Save Changes</span>
                             <span class="ladda-spinner"></span>
                         </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Excel Modal (uses cs not js)-->
+    <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form asp-action="ImportExcel" asp-controller="Report" method="post" enctype="multipart/form-data">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="importModalLabel">Import Reports from Excel</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="ExcelFile" class="form-label">Select Excel File (.xlsx)</label>
+                            <input type="file" class="form-control" name="ExcelFile" id="ExcelFile" accept=".xlsx" required />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-info">Import</button>
                     </div>
                 </form>
             </div>
