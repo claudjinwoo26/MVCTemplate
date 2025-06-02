@@ -232,8 +232,46 @@ namespace MVCTemplate.Controllers
                 var titleCell = row.GetCell(0);
                 string title = titleCell?.ToString().Trim() ?? string.Empty;
 
-                var descCell = row.GetCell(2);
-                string description = descCell?.ToString().Trim() ?? string.Empty;
+                // Corrected: description is in column 2, index 1
+                var descCell = row.GetCell(1);
+                string description = string.Empty;
+                if (descCell != null)
+                {
+                    switch (descCell.CellType)
+                    {
+                        case NPOI.SS.UserModel.CellType.String:
+                            description = descCell.StringCellValue.Trim();
+                            break;
+                        case NPOI.SS.UserModel.CellType.Numeric:
+                            description = descCell.NumericCellValue.ToString();
+                            break;
+                        case NPOI.SS.UserModel.CellType.Formula:
+                            var evaluator = WorkbookFactory.CreateFormulaEvaluator(descCell.Sheet.Workbook);
+                            var evaluatedValue = evaluator.Evaluate(descCell);
+                            if (evaluatedValue != null)
+                            {
+                                switch (evaluatedValue.CellType)
+                                {
+                                    case NPOI.SS.UserModel.CellType.String:
+                                        description = evaluatedValue.StringValue.Trim();
+                                        break;
+                                    case NPOI.SS.UserModel.CellType.Numeric:
+                                        description = evaluatedValue.NumberValue.ToString();
+                                        break;
+                                    default:
+                                        description = evaluatedValue.FormatAsString().Trim('"');
+                                        break;
+                                }
+                            }
+                            break;
+                        case NPOI.SS.UserModel.CellType.Boolean:
+                            description = descCell.BooleanCellValue.ToString();
+                            break;
+                        default:
+                            description = descCell.ToString().Trim();
+                            break;
+                    }
+                }
 
                 if (string.IsNullOrEmpty(title)) continue;
 
@@ -295,6 +333,8 @@ namespace MVCTemplate.Controllers
             var hashBytes = sha256.ComputeHash(data);
             return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
         }
+
+
 
 
 
