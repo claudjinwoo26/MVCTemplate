@@ -148,7 +148,7 @@ namespace MVCTemplate.Areas.Admin.Controllers
             return Json(new List<object> { names, quantities });
         }
 
-        [HttpPut]
+        [HttpPost] // used to be [HttpPut]
         public IActionResult Update(Contract obj)
         {
             try

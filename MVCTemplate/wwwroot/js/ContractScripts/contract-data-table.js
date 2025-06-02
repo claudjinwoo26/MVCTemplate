@@ -52,9 +52,21 @@ function loadDataTable() {
                 data: 'id',
                 "render": function (data, type, full, meta) {
                     return `<div class="w-75 btn-group" role="group">
-                                    <button type="button" data-id="${data}" data-name="${full.name}" data-description="${full.description}" data-validity="${full.validity}"  data-personid="${full.personId}" class="btn-shadow btn btn-info" data-bs-toggle="modal" data-bs-target="#updateModal"> <i class="lnr-pencil"></i> Edit</button>
-                                    <a href="javascript:void(0);" onClick="Delete('/Admin/Contract/Delete/${data}')" class="btn-shadow btn btn-danger mx-3"> <i class="lnr-trash"></i> Delete</a>
-                                </div>`;
+            <button type="button"
+                data-id="${data}"
+                data-name="${full.name}"
+                data-description="${full.description}"
+                data-validity="${full.validity}"
+                data-person-id="${full.personId}"
+                class="btn-shadow btn btn-info"
+                data-bs-toggle="modal"
+                data-bs-target="#updateModal">
+                <i class="lnr-pencil"></i> Edit
+            </button>
+            <a href="javascript:void(0);" onClick="Delete('/Admin/Contract/Delete/${data}')" class="btn-shadow btn btn-danger mx-3">
+                <i class="lnr-trash"></i> Delete
+            </a>
+        </div>`;
                 },
                 width: "25%", className: "text-center", orderable: false
             }
@@ -81,13 +93,13 @@ $('#updateModal').on('show.bs.modal', function (event) {
     var name = button.data('name');
     var description = button.data('description');
     var validity = button.data('validity');
-    var personId = button.data('personId');
+    var personId = button.data('personid');
     var modal = $(this);
 
     modal.find('#Contract_Id').val(id);
     modal.find('#Contract_Name').val(name);
     modal.find('#Contract_Description').val(description);
-    modal.find('#Contract_Validity').val(validity);
+    modal.find('#Contract_Validity').val(validity ? validity.split('T')[0] : '');
     modal.find('#Contract_PersonId').val(personId).trigger('change');
 });
 
