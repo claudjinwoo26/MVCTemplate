@@ -21,11 +21,17 @@ namespace MVCtemplate.DataAccess.Data
         {
             base.OnModelCreating(builder);
 
-            builder.Entity<Contract>()
+            /*builder.Entity<Contract>()
                 .HasOne(c => c.Person)
                 .WithMany()
                 .HasForeignKey(c => c.PersonId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Cascade);*/
+
+            builder.Entity<Person>()
+                .HasOne(p => p.Category)
+                .WithMany()
+                .HasForeignKey(p => p.CategoryId)
+                .OnDelete(DeleteBehavior.SetNull);
 
         }
     }

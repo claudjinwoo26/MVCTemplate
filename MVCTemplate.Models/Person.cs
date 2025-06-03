@@ -17,7 +17,7 @@ namespace MVCTemplate.Models
         public string Name { get; set; }
         public string Position { get; set; }
 
-        public int CategoryId { get; set; } // for foreign key
+        public int? CategoryId { get; set; } // for foreign key
         [ForeignKey("CategoryId")]
         public Category? Category { get; set; }
 
