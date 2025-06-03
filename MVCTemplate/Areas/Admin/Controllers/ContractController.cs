@@ -207,11 +207,29 @@ namespace MVCTemplate.Areas.Admin.Controllers
 
             try
             {
+                // ✅ Fetch the original contract from DB
+                var existing = _unitOfWork.Contract.GetFirstOrDefault(c => c.Id == obj.Id);
+                if (existing == null)
+                {
+                    return NotFound(new { message = "Contract not found." });
+                }
+
+                // ✅ Rule 1: Disallow editing if original contract is already expired
+                if (existing.Validity.HasValue && existing.Validity.Value.Date < DateTime.Now.Date)
+                {
+                    return BadRequest(new { message = "Editing is not allowed for contracts with expired validity." });
+                }
+
+                // ✅ Rule 2: Prevent setting new validity in the past
+                if (obj.Validity.HasValue && obj.Validity.Value.Date < DateTime.Now.Date)
+                {
+                    ModelState.AddModelError("Contract.Validity", "New validity date cannot be in the past.");
+                }
+
                 obj.GenerateUpdatedAt();
 
-                Contract? existingContract = _unitOfWork.Contract.ContinueIfNoChangeOnUpdate(obj.Name, obj.Id);
-
-                if (existingContract != null)
+                Contract? duplicateName = _unitOfWork.Contract.ContinueIfNoChangeOnUpdate(obj.Name, obj.Id);
+                if (duplicateName != null)
                 {
                     ModelState.AddModelError("Contract.Name", "Contract Name already exists");
                 }
@@ -242,6 +260,8 @@ namespace MVCTemplate.Areas.Admin.Controllers
                 return BadRequest(new { message = "An unexpected error occurred" });
             }
         }
+
+
 
 
 

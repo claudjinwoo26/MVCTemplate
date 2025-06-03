@@ -50,26 +50,43 @@ function loadDataTable() {
             { data: 'personId', "autowidth": true },
             {
                 data: 'id',
-                "render": function (data, type, full, meta) {
+                render: function (data, type, full, meta) {
+                    const validityDate = new Date(full.validity);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+
+                    const isEditable = validityDate >= today;
+
+                    const editButton = isEditable
+                        ? `<button type="button"
+                    data-id="${data}"
+                    data-name="${full.name}"
+                    data-description="${full.description}"
+                    data-validity="${full.validity}"
+                    data-person-id="${full.personId}"
+                    class="btn-shadow btn btn-info"
+                    data-bs-toggle="modal"
+                    data-bs-target="#updateModal">
+                    <i class="lnr-pencil"></i> Edit
+               </button>`
+                        : `<button type="button"
+                    class="btn-shadow btn btn-secondary"
+                    disabled title="Editing disabled for expired contracts">
+                    <i class="lnr-lock"></i> Locked
+               </button>`;
+
+                    const deleteButton = `<a href="javascript:void(0);" onClick="Delete('/Admin/Contract/Delete/${data}')" class="btn-shadow btn btn-danger mx-3">
+                                <i class="lnr-trash"></i> Delete
+                              </a>`;
+
                     return `<div class="w-75 btn-group" role="group">
-            <button type="button"
-                data-id="${data}"
-                data-name="${full.name}"
-                data-description="${full.description}"
-                data-validity="${full.validity}"
-                data-person-id="${full.personId}"
-                class="btn-shadow btn btn-info"
-                data-bs-toggle="modal"
-                data-bs-target="#updateModal">
-                <i class="lnr-pencil"></i> Edit
-            </button>
-            <a href="javascript:void(0);" onClick="Delete('/Admin/Contract/Delete/${data}')" class="btn-shadow btn btn-danger mx-3">
-                <i class="lnr-trash"></i> Delete
-            </a>
-        </div>`;
+                    ${editButton}
+                    ${deleteButton}
+                </div>`;
                 },
                 width: "25%", className: "text-center", orderable: false
             }
+
         ]
     });
 }
