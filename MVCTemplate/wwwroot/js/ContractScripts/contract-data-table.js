@@ -43,7 +43,7 @@ function loadDataTable() {
                 render: function (data) {
                     const date = new Date(data);
                     const options = { year: 'numeric', month: 'long', day: 'numeric' };
-                    return date.toLocaleDateString('en-US', options); // e.g. "June 2, 2025"
+                    return date.toLocaleDateString('en-US', options);
                 },
                 "autowidth": true
             },
@@ -93,13 +93,29 @@ $('#updateModal').on('show.bs.modal', function (event) {
     var name = button.data('name');
     var description = button.data('description');
     var validity = button.data('validity');
-    var personId = button.data('personid');
+    var personId = button.data('personId');
     var modal = $(this);
 
     modal.find('#Contract_Id').val(id);
     modal.find('#Contract_Name').val(name);
     modal.find('#Contract_Description').val(description);
     modal.find('#Contract_Validity').val(validity ? validity.split('T')[0] : '');
-    modal.find('#Contract_PersonId').val(personId).trigger('change');
+
+    const personSelect = modal.find('#Contract_PersonId');
+
+    // Check if the current person is already in the dropdown
+    if (personSelect.find(`option[value="${personId}"]`).length === 0 && personId) {
+        // Fetch the person name via AJAX
+        $.get(`/Admin/Contract/GetPersonNameById?id=${personId}`, function (response) {
+            personSelect.append(new Option(response.name, personId, true, true)).trigger('change');
+        }).fail(function () {
+            // If fetch fails, fallback to ID
+            personSelect.append(new Option(`(Unknown Person #${personId})`, personId, true, true)).trigger('change');
+        });
+    } else {
+        personSelect.val(personId).trigger('change');
+    }
+
 });
+
 

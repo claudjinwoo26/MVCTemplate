@@ -53,6 +53,16 @@ namespace MVCTemplate.Areas.Admin.Controllers
             return View(viewModel);
         }
 
+        [HttpGet] // for edit
+        public IActionResult GetPersonNameById(int id)
+        {
+            var person = _unitOfWork.Person.GetFirstOrDefault(p => p.Id == id);
+            if (person == null)
+                return NotFound();
+
+            return Ok(new { name = person.Name });
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(ContractVM model)
