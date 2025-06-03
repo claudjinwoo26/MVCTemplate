@@ -22,6 +22,8 @@ namespace MVCTemplate.DataAccess.Repository.IRepository
         Contract GetFirstOrDefault(Expression<Func<Contract, bool>> predicate); // rest of getfirstordefault is in productrepository
 
         List<Contract> ToList();
+        public Contract GetNoTracking(Expression<Func<Contract, bool>> filter); // for delete to stop erroring
 
+        void Attach(Contract entity); // for delete to stop erroring
     }
 }

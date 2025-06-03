@@ -20,9 +20,12 @@ namespace MVCTemplate.DataAccess.Repository
             _db = db;
         }
 
-        public bool Exists(int id)
+        public bool Exists(int? id)
         {
-            return _db.Persons.Any(p => p.Id == id);
+            if (!id.HasValue)
+                return false;
+
+            return _db.Persons.Any(p => p.Id == id.Value);
         }
 
         public void Add(Person person) // for the app person

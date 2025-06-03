@@ -148,7 +148,7 @@ namespace MVCTemplate.Areas.Admin.Controllers
             return Json(new List<object> { names, quantities });
         }
 
-        [HttpPost] // used to be [HttpPut]
+        [HttpPost]
         public IActionResult Update(Contract obj)
         {
             try
@@ -187,36 +187,84 @@ namespace MVCTemplate.Areas.Admin.Controllers
                 return BadRequest(new { message = "An unexpected error occurred" });
             }
         }
-
+        /*
         [HttpDelete]
         public IActionResult Delete(int id)
         {
+            if (id == 0)
+            {
+                return BadRequest(new { message = "Contract Id not found" });
+            }
+
+            var contract = _unitOfWork.Contract.Get(u => u.Id == id);
+            if (contract == null)
+            {
+                return BadRequest(new { message = "Contract Id not found" });
+            }
+
+            // Example: Check if related data exists that references this contract
+            // Replace RelatedEntity and ContractId with your actual related table and FK property
+            bool hasRelatedData = _unitOfWork.Contract.GetAll().Any(r => r.PersonId == id);
+            if (hasRelatedData)
+            {
+                return BadRequest(new { message = "Cannot delete contract because related data exists." });
+            }
+
             try
             {
-                if (id == 0)
-                {
-                    return BadRequest(new { message = "Contract Id not found" });
-                }
-
-                var contract = _unitOfWork.Contract.Get(u => u.Id == id);
-                if (contract == null)
-                {
-                    return BadRequest(new { message = "Contract Id not found" });
-                }
-
                 _unitOfWork.Contract.Remove(contract);
                 _unitOfWork.Save();
                 return Ok(new { message = "Contract deleted successfully" });
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException ex)
             {
-                return BadRequest(new { message = "Unable to delete data because it is being used in another table" });
+                var innerMessage = ex.InnerException?.Message ?? "No inner exception";
+                return BadRequest(new { message = $"Unable to delete data because: {innerMessage}" });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = $"Unexpected error: {ex.Message}" });
             }
         }
+        */
+
+        [HttpDelete]
+        public IActionResult Delete(int id)
+        {
+            if (id == 0)
+            {
+                return BadRequest(new { message = "Contract Id not found" });
+            }
+
+            // Reload the entity fresh from DB (no tracking)
+            var contract = _unitOfWork.Contract.GetNoTracking(u => u.Id == id);
+
+            if (contract == null)
+            {
+                // Entity already deleted (or never existed), so return success or not found
+                return NotFound(new { message = "Contract already deleted or does not exist." });
+            }
+
+            try
+            {
+                // Attach the entity to context if needed before remove
+                _unitOfWork.Contract.Attach(contract);
+                _unitOfWork.Contract.Remove(contract);
+                _unitOfWork.Save();
+
+                return Ok(new { message = "Contract deleted successfully" });
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                // Concurrency exception means entity no longer exists - treat as successful delete
+                return Ok(new { message = "Contract already deleted." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = $"Unexpected error: {ex.Message}" });
+            }
+        }
+
 
         #region API Calls
 

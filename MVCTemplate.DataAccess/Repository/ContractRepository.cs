@@ -65,6 +65,12 @@ namespace MVCTemplate.DataAccess.Repository
             return _db.Contracts.FirstOrDefault(predicate);
         } //since it cant be in interface repository
 
+        public Contract GetNoTracking(Expression<Func<Contract, bool>> filter)
+        {
+            return _db.Set<Contract>()
+                      .AsNoTracking()
+                      .FirstOrDefault(filter); // for delete to stop erroring
+        }
 
         public void Remove(Contract contract)
         {
@@ -97,5 +103,9 @@ namespace MVCTemplate.DataAccess.Repository
             return _db.Contracts.FirstOrDefault(i => i.Name == name && i.Id != Id);
         }
 
+        public void Attach(Contract entity)
+        {
+            _db.Contracts.Attach(entity); // for delete to stop erroring
+        }
     }
 }

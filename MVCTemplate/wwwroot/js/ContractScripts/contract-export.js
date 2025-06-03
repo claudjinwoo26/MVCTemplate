@@ -8,7 +8,7 @@ document.querySelector("#button-excel").addEventListener("click", async function
     if (searchValue) {
         dataToExport = table.rows({ search: 'applied' }).data().toArray();
     } else {
-        let response = await fetch('/Admin/Product/GetAllContracts'); //change to account for url naming
+        let response = await fetch('/Admin/Contract/GetAllContracts'); //change to account for url naming
         let result = await response.json();
         dataToExport = result.data;
     }

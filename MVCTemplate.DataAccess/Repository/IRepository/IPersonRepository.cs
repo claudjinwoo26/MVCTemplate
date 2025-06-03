@@ -15,6 +15,6 @@ namespace MVCTemplate.DataAccess.Repository.IRepository
         Person? ContinueIfNoChangeOnUpdate(string name, int Id);
 
         Person GetFirstOrDefault(Expression<Func<Person, bool>> predicate);
-        bool Exists(int id);
+        bool Exists(int? id);
     }
 }

@@ -21,10 +21,10 @@ namespace MVCTemplate.Models
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}", ApplyFormatInEditMode = true)]
         [DisplayName("Contract Validity")]
-        public DateTime Validity { get; set; }
+        public DateTime? Validity { get; set; }
 
         [Required]
-        public int PersonId { get; set; }
+        public int? PersonId { get; set; }
 
         [ForeignKey("PersonId")]
         public Person? Person { get; set; } // optional: if you have a navigation property
