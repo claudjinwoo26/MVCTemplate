@@ -9,6 +9,7 @@ using ClosedXML.Excel;
 using System.IO;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using MVCTemplate.ViewModels;
+using System.Globalization;
 
 namespace MVCTemplate.Areas.Admin.Controllers
 {
@@ -144,15 +145,51 @@ namespace MVCTemplate.Areas.Admin.Controllers
             }
         }
 
-
+        // for donut and pie
         [HttpPost]
-        public IActionResult GetContractsData()
+        [Route("/Admin/Contract/GetContractsPerMonth")]
+        public IActionResult GetContractsPerMonth()
         {
-            var names = _context.Contracts.Select(p => p.Name).ToList();
-            var validity = _context.Contracts.Select(p => p.Validity).ToList();
+            var currentYear = DateTime.Now.Year;
 
-            return Json(new List<object> { names, validity });
+            var monthlyData = _context.Contracts
+                .Where(c => c.Validity.HasValue && c.Validity.Value.Year == currentYear)
+                .GroupBy(c => c.Validity.Value.Month)
+                .OrderBy(g => g.Key)
+                .Select(g => new
+                {
+                    Month = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(g.Key),
+                    Count = g.Count()
+                }).ToList();
+
+            var labels = monthlyData.Select(d => d.Month).ToList();
+            var values = monthlyData.Select(d => d.Count).ToList();
+
+            return Json(new List<object> { labels, values });
         }
+
+        // for bar and line
+        [HttpPost]
+        public IActionResult GetContractsPerYear()
+        {
+            var contractCounts = _context.Contracts
+                .Where(c => c.Validity.HasValue)
+                .GroupBy(c => c.Validity.Value.Year)
+                .OrderBy(g => g.Key)
+                .Select(g => new
+                {
+                    Year = g.Key.ToString(),
+                    Count = g.Count()
+                })
+                .ToList();
+
+            var years = contractCounts.Select(x => x.Year).ToList();
+            var counts = contractCounts.Select(x => x.Count).ToList();
+
+            return Json(new List<object> { years, counts });
+        }
+
+
 
         [HttpPost]
         public IActionResult Update(Contract obj)

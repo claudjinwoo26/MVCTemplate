@@ -139,9 +139,7 @@
         </div>
     </div>
 
-
-
-    @* Update Modal *@
+    <!-- Update Modal -->
     <div class="modal fade" id="updateModal" tabindex="-1" role="dialog"
          aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -182,18 +180,15 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn-shadow btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" id="createEditFormSubmitBtn" class="ladda-button me-2 btn-shadow btn btn-primary" data-style="expand-left">
-                            <span class="ladda-label">Save Changes</span>
-                            <span class="ladda-spinner"></span>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" id="createEditFormSubmitBtn" class="btn btn-primary">
+                            Save Changes
                         </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-
-
 }
 
 @section Scripts {
@@ -203,9 +198,150 @@
     <script src="~/js/ContractScripts/contract-data-table.js"></script>
     <script src="~/js/deleteGeneralSettings.js"></script>
     <script src="~/js/ContractScripts/contract-export.js"></script>
-    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script> @*for export using javascript*@
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 
     <script>
+        function loadBarOrLineChart(chartType) {
+            $("#ChartView").show().html('<canvas id="myChart" style="max-width:750px; max-height:400px;"></canvas>');
+
+            $.ajax({
+                type: "POST",
+                url: "/Admin/Contract/GetContractsPerYear",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    var labels = data[0]; // ["2023", "2024", "2025"]
+                    var values = data[1]; // [10, 15, 8]
+
+                    // Distinct colors (extend this if needed)
+                    const colors = [
+                        "#007bff", "#28a745", "#dc3545", "#ffc107", "#17a2b8",
+                        "#6c757d", "#fd7e14", "#20c997", "#6f42c1", "#e83e8c",
+                        "#6610f2", "#343a40"
+                    ];
+
+                    // Generate separate datasets for each year
+                    let datasets;
+                    if (chartType === 'line') {
+                        datasets = [{
+                            label: 'Contracts Per Year',
+                            data: values,
+                            borderColor: "#007bff",
+                            backgroundColor: "#007bff",
+                            fill: false,
+                            tension: 0.1 // slight curve, can be 0 for straight lines
+                        }];
+                    } else {
+                        datasets = labels.map((label, index) => ({
+                            label: label,
+                            data: labels.map((_, i) => i === index ? values[index] : null),
+                            backgroundColor: colors[index % colors.length],
+                            borderColor: colors[index % colors.length],
+                            fill: true
+                        }));
+                    }
+
+
+                    let chartTitle = `Contracts from ${labels[0]} to ${labels[labels.length - 1]}`;
+
+                    new Chart(document.getElementById("myChart"), {
+                        type: chartType,
+                        data: {
+                            labels: labels,
+                            datasets: datasets
+                        },
+                        options: {
+                            responsive: true,
+                            interaction: {
+                                mode: 'index',
+                                intersect: false
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: { precision: 0 },
+                                    title: { display: true, text: 'Number of Contracts' }
+                                },
+                                x: {
+                                    title: { display: true, text: 'Year' }
+                                }
+                            },
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: chartTitle
+                                },
+                                legend: {
+                                    display: true,
+                                    onClick: function (e, legendItem, legend) {
+                                        const ci = legend.chart;
+
+                                        // Disable toggling for line chart only
+                                        if (ci.config.type === 'line') {
+                                            return; // Do nothing on click
+                                        }
+
+                                        const index = legendItem.datasetIndex;
+                                        const meta = ci.getDatasetMeta(index);
+                                        meta.hidden = meta.hidden === null ? !ci.data.datasets[index].hidden : null;
+                                        ci.update();
+                                    }
+                                }
+
+                            }
+                        }
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading bar/line data:", error);
+                }
+            });
+        }
+
+
+
+        function loadPieOrDoughnutChart(chartType) {
+            $("#ChartView").show().html('<canvas id="myChart" style="max-width:750px; max-height:400px;"></canvas>');
+
+            $.ajax({
+                type: "POST",
+                url: "/Admin/Contract/GetContractsPerMonth",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    var labels = data[0];
+                    var values = data[1];
+
+                    var pieColors = [
+                        "#007bff", "#28a745", "#dc3545", "#ffc107", "#17a2b8",
+                        "#6c757d", "#fd7e14", "#20c997", "#6f42c1", "#e83e8c",
+                        "#6610f2", "#343a40"
+                    ];
+
+                    new Chart(document.getElementById("myChart"), {
+                        type: chartType,
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                backgroundColor: pieColors,
+                                data: values
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: { display: true, text: 'Contracts Per Person' },
+                                legend: { display: true }
+                            }
+                        }
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading pie/doughnut data:", error);
+                }
+            });
+        }
+
         $(function () {
             $("#ShowGraphBtn").click(function () {
                 var chartType = $("#ChartType").val();
@@ -214,62 +350,13 @@
                     return;
                 }
 
-                $("#ChartView").show().html('<canvas id="myChart" style="max-width:750px; max-height:400px;"></canvas>');
-
-                $.ajax({
-                    type: "POST",
-                    url: "/Admin/Contracts/GetContractsData",
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                    success: function (data) {
-                        var _chartLabels = data[0];
-                        var _chartData = data[1];
-
-                        var barColors = ["#007bff", "#28a745", "#dc3545", "#ffc107", "#17a2b8", "#6c757d", "#fd7e14", "#20c997"];
-
-                        new Chart(document.getElementById("myChart"), {
-                            type: chartType,
-                            data: {
-                                labels: _chartLabels,
-                                datasets: [{
-                                    label: 'Product Quantities',
-                                    backgroundColor: barColors,
-                                    data: _chartData
-                                }]
-                            },
-                            options: {
-                                responsive: true,
-                                plugins: {
-                                    title: {
-                                        display: true,
-                                        text: 'Product Quantities by Name'
-                                    },
-                                    legend: {
-                                        display: chartType === 'pie' || chartType === 'doughnut'
-                                    }
-                                },
-                                scales: (chartType === 'bar' || chartType === 'line') ? {
-                                    x: {
-                                        title: {
-                                            display: true,
-                                            text: 'Product Name'
-                                        }
-                                    },
-                                    y: {
-                                        beginAtZero: true,
-                                        title: {
-                                            display: true,
-                                            text: 'Quantity'
-                                        }
-                                    }
-                                } : {}
-                            }
-                        });
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("Error fetching chart data:", error);
-                    }
-                });
+                if (chartType === "bar" || chartType === "line") {
+                    loadBarOrLineChart(chartType);
+                } else if (chartType === "pie" || chartType === "doughnut") {
+                    loadPieOrDoughnutChart(chartType);
+                } else {
+                    alert("Unsupported chart type.");
+                }
             });
 
             $("#RemoveGraphBtn").click(function () {
