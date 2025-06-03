@@ -98,12 +98,12 @@ namespace MVCTemplate.Areas.Admin.Controllers
             return View(model);
         }
 
-
         private List<Contract> GetContracts()
         {
             return _unitOfWork.Contract.ToList();
         }
 
+        // not being used
         public async Task<ActionResult> ExportToExcel()
         {
             var contracts = GetContracts();
@@ -112,6 +112,7 @@ namespace MVCTemplate.Areas.Admin.Controllers
             {
                 var worksheet = workbook.AddWorksheet("Sheet 1");
 
+                // Header row
                 worksheet.Cell(1, 1).Value = "ID";
                 worksheet.Cell(1, 2).Value = "Name";
                 worksheet.Cell(1, 3).Value = "Description";
@@ -124,6 +125,10 @@ namespace MVCTemplate.Areas.Admin.Controllers
                     worksheet.Cell(row, 3).Value = item.Validity;
                     row++;
                 }
+
+                // Apply auto-filter on the entire data range including headers
+                var lastRow = row - 1;  // last row with data
+                worksheet.Range(1, 1, lastRow, 3).SetAutoFilter();
 
                 using (var memoryStream = new MemoryStream())
                 {
@@ -139,13 +144,14 @@ namespace MVCTemplate.Areas.Admin.Controllers
             }
         }
 
+
         [HttpPost]
         public IActionResult GetContractsData()
         {
             var names = _context.Contracts.Select(p => p.Name).ToList();
-            var quantities = _context.Contracts.Select(p => p.Validity).ToList();
+            var validity = _context.Contracts.Select(p => p.Validity).ToList();
 
-            return Json(new List<object> { names, quantities });
+            return Json(new List<object> { names, validity });
         }
 
         [HttpPost]
@@ -161,7 +167,7 @@ namespace MVCTemplate.Areas.Admin.Controllers
                     ModelState.AddModelError("Name", "Contract Name Already exists");
                 }
 
-                if (ModelState.IsValid)
+                if (ModelState.IsValid) // false
                 {
                     _unitOfWork.Contract.Update(obj);
                     _unitOfWork.Save();
@@ -187,46 +193,7 @@ namespace MVCTemplate.Areas.Admin.Controllers
                 return BadRequest(new { message = "An unexpected error occurred" });
             }
         }
-        /*
-        [HttpDelete]
-        public IActionResult Delete(int id)
-        {
-            if (id == 0)
-            {
-                return BadRequest(new { message = "Contract Id not found" });
-            }
 
-            var contract = _unitOfWork.Contract.Get(u => u.Id == id);
-            if (contract == null)
-            {
-                return BadRequest(new { message = "Contract Id not found" });
-            }
-
-            // Example: Check if related data exists that references this contract
-            // Replace RelatedEntity and ContractId with your actual related table and FK property
-            bool hasRelatedData = _unitOfWork.Contract.GetAll().Any(r => r.PersonId == id);
-            if (hasRelatedData)
-            {
-                return BadRequest(new { message = "Cannot delete contract because related data exists." });
-            }
-
-            try
-            {
-                _unitOfWork.Contract.Remove(contract);
-                _unitOfWork.Save();
-                return Ok(new { message = "Contract deleted successfully" });
-            }
-            catch (DbUpdateException ex)
-            {
-                var innerMessage = ex.InnerException?.Message ?? "No inner exception";
-                return BadRequest(new { message = $"Unable to delete data because: {innerMessage}" });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = $"Unexpected error: {ex.Message}" });
-            }
-        }
-        */
 
         [HttpDelete]
         public IActionResult Delete(int id)
