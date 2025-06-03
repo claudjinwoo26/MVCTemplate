@@ -56,7 +56,7 @@ namespace MVCTemplate.DataAccess.Migrations
                 column: "PersonId",
                 principalTable: "Persons",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
+                onDelete: ReferentialAction.NoAction);
 
             // Revert columns to non-nullable with default values
             migrationBuilder.AlterColumn<DateTime>(

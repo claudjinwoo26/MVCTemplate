@@ -178,7 +178,7 @@ namespace MVCTemplate.Areas.Admin.Controllers
                 //_unitOfWork.Save();
                 return Ok(new { message = "Person deleted successfully" });
             }
-            catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx && sqlEx.Number == 547)
+            catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx && sqlEx.Number == 547) // DELETE statement conflicted with the reference constraint \"FK-Contracts_Persons_PersonId\"
             {
                 return BadRequest(new { message = "Unable to delete data because it is being used in another table" });
             }

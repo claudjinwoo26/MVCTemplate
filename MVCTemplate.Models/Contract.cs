@@ -24,7 +24,7 @@ namespace MVCTemplate.Models
         public DateTime? Validity { get; set; }
 
         [Required]
-        public int? PersonId { get; set; }
+        public int PersonId { get; set; }
 
         [ForeignKey("PersonId")]
         public Person? Person { get; set; } // optional: if you have a navigation property
