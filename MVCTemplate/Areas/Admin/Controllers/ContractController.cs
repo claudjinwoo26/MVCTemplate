@@ -190,21 +190,23 @@ namespace MVCTemplate.Areas.Admin.Controllers
         }
 
 
-
         [HttpPost]
-        public IActionResult Update(Contract obj)
+        public IActionResult Update(ContractVM vm)
         {
+            var obj = vm.Contract;
+
             try
             {
                 obj.GenerateUpdatedAt();
-                Contract? contract = _unitOfWork.Contract.ContinueIfNoChangeOnUpdate(obj.Name, obj.Id);
 
-                if (contract != null)
+                Contract? existingContract = _unitOfWork.Contract.ContinueIfNoChangeOnUpdate(obj.Name, obj.Id);
+
+                if (existingContract != null)
                 {
-                    ModelState.AddModelError("Name", "Contract Name Already exists");
+                    ModelState.AddModelError("Contract.Name", "Contract Name already exists");
                 }
 
-                if (ModelState.IsValid) // false
+                if (ModelState.IsValid)
                 {
                     _unitOfWork.Contract.Update(obj);
                     _unitOfWork.Save();
@@ -213,7 +215,7 @@ namespace MVCTemplate.Areas.Admin.Controllers
 
                 var errors = ModelState.ToDictionary(
                     kvp => kvp.Key,
-                    kvp => kvp.Value?.Errors?.Select(e => e.ErrorMessage)?.ToArray() ?? []);
+                    kvp => kvp.Value?.Errors?.Select(e => e.ErrorMessage).ToArray() ?? Array.Empty<string>());
 
                 return BadRequest(new { errors, message = "Something went wrong!" });
             }
@@ -230,6 +232,8 @@ namespace MVCTemplate.Areas.Admin.Controllers
                 return BadRequest(new { message = "An unexpected error occurred" });
             }
         }
+
+
 
 
         [HttpDelete]

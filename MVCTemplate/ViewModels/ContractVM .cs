@@ -2,8 +2,6 @@
 using System.ComponentModel.DataAnnotations;
 using MVCTemplate.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Diagnostics.Contracts;
-using MVCTemplate.Models;
 
 namespace MVCTemplate.ViewModels
 {
